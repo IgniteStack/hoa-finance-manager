@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
-import { House } from '@phosphor-icons/react'
+import { House, EnvelopeSimple, Copy } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 export function LoginPage() {
@@ -13,7 +14,8 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPasswordChange, setShowPasswordChange] = useState(false)
-  const { login } = useAuth()
+  const [showForgotEmail, setShowForgotEmail] = useState(false)
+  const { login, users } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,6 +36,13 @@ export function LoginPage() {
     
     setIsLoading(false)
   }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success('Email copied to clipboard')
+  }
+
+  const adminUsers = users.filter(u => u.role === 'admin')
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
@@ -82,8 +91,73 @@ export function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
+          
+          <div className="mt-4 text-center">
+            <Button 
+              variant="link" 
+              onClick={() => setShowForgotEmail(true)}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Forgot your email?
+            </Button>
+          </div>
         </CardContent>
       </Card>
+
+      <Dialog open={showForgotEmail} onOpenChange={setShowForgotEmail}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Admin Email Addresses</DialogTitle>
+            <DialogDescription>
+              {adminUsers.length > 0 
+                ? 'Here are all the administrator email addresses in the system:' 
+                : 'No admin users found in the system.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-3 mt-4">
+            {adminUsers.map((user) => (
+              <div 
+                key={user.id} 
+                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="bg-primary/10 text-primary p-2 rounded-md shrink-0">
+                    <EnvelopeSimple size={18} weight="fill" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.firstName} {user.lastName}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => copyToClipboard(user.email)}
+                  className="shrink-0"
+                >
+                  <Copy size={18} />
+                </Button>
+              </div>
+            ))}
+            
+            {adminUsers.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No administrator accounts found.</p>
+                <p className="text-sm mt-2">You may need to run the setup wizard again.</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-4 flex justify-end">
+            <Button onClick={() => setShowForgotEmail(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
