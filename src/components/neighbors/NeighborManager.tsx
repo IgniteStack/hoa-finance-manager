@@ -70,7 +70,7 @@ export function NeighborManager() {
   }
 
   const handleDelete = (id: string) => {
-    setNeighbors((current) => current.filter(n => n.id !== id))
+    setNeighbors((current) => (current || []).filter(n => n.id !== id))
     toast.success('Neighbor deleted successfully')
   }
 
@@ -79,7 +79,7 @@ export function NeighborManager() {
 
     if (editingNeighbor) {
       setNeighbors((current) => 
-        current.map(n => n.id === editingNeighbor.id 
+        (current || []).map(n => n.id === editingNeighbor.id 
           ? { ...editingNeighbor, ...formData }
           : n
         )
@@ -91,7 +91,7 @@ export function NeighborManager() {
         ...formData,
         createdAt: new Date().toISOString()
       }
-      setNeighbors((current) => [...current, newNeighbor])
+      setNeighbors((current) => [...(current || []), newNeighbor])
       toast.success('Neighbor added successfully')
     }
 
@@ -99,7 +99,7 @@ export function NeighborManager() {
     resetForm()
   }
 
-  const filteredNeighbors = neighbors.filter(n => 
+  const filteredNeighbors = (neighbors || []).filter(n => 
     searchQuery === '' ||
     `${n.firstName} ${n.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     n.houseNumber.toLowerCase().includes(searchQuery.toLowerCase())

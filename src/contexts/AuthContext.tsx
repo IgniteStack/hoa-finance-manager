@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { User, AuthState } from '@/lib/types'
 
@@ -15,36 +15,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     if (email === 'admin@hoa.com' && password === 'admin123') {
-      setUser({
+      setUser((currentUser) => ({
         id: '1',
         email: 'admin@hoa.com',
         role: 'admin'
-      })
+      }))
       return true
     } else if (email === 'neighbor@hoa.com' && password === 'neighbor123') {
-      setUser({
+      setUser((currentUser) => ({
         id: '2',
         email: 'neighbor@hoa.com',
         role: 'neighbor',
         neighborId: 'n1'
-      })
+      }))
       return true
     }
     return false
   }
 
   const logout = () => {
-    setUser(null)
+    setUser((currentUser) => null)
   }
+
+  const currentUser = user ?? null
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
+        user: currentUser,
+        isAuthenticated: !!currentUser,
         login,
         logout,
-        isAdmin: user?.role === 'admin'
+        isAdmin: currentUser?.role === 'admin'
       }}
     >
       {children}
