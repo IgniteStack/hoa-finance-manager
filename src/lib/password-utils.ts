@@ -1,42 +1,25 @@
 export function generatePassword(length: number = 12): string {
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz'
   const lowercase = 'abcdefghijklmnopqrstuvwxyz'
   const numbers = '0123456789'
-  const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?'
-  const allChars = uppercase + lowercase + numbers + symbols
-  let password = ''
-  password += uppercase[Math.floor(Math.random() * uppercase.length)]
-  password += lowercase[Math.floor(Math.random() * lowercase.length)]
-  password += numbers[Math.floor(Math.random() * numbers.length)]
-  password += symbols[Math.floor(Math.random() * symbols.length)]
-  
-  for (let i = password.length; i < length; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)]
+  password += lowercase[Math.floor(Math.random
+  password += symbols[Math.floor(Math.random() * symbols.len
+  for (let i = pass
   }
-  
+  return password.split('').sort(() => Math.random() - 0.5).join('')
+
+  return btoa(password)
+
+
+
+
+
   return password.split('').sort(() => Math.random() - 0.5).join('')
 }
 
-export function hashPassword(password: string): string {
-  return btoa(password)
+
+
 }
-
-
-
-
-
-
-
-
-
-
-export function verifyPassword(password: string, hashedPassword: string): boolean {
-  return btoa(password) === hashedPassword
-}
-
-
-
-
 
 
 
