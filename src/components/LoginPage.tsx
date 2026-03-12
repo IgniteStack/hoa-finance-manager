@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useKV } from '@github/spark/hooks'
+import { SystemConfig } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
 import { ForgotPasswordDialog } from '@/components/ForgotPasswordDialog'
-import { House, EnvelopeSimple, Copy } from '@phosphor-icons/react'
+import { House, EnvelopeSimple, Copy, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 export function LoginPage() {
@@ -17,7 +20,9 @@ export function LoginPage() {
   const [showPasswordChange, setShowPasswordChange] = useState(false)
   const [showForgotEmail, setShowForgotEmail] = useState(false)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
   const { login, users } = useAuth()
+  const [systemConfig, setSystemConfig] = useKV<SystemConfig>('system-config', { isSetupComplete: false, totalHouses: 0 })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,12 +44,24 @@ export function LoginPage() {
     setIsLoading(false)
   }
 
+  const handleResetSetup = async () => {
+    const keys = await window.spark.kv.keys()
+    for (const key of keys) {
+      await window.spark.kv.delete(key)
+    }
+    toast.success('System reset complete. Reloading...')
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  }
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
     toast.success('Email copied to clipboard')
   }
 
   const adminUsers = users.filter(u => u.role === 'admin')
+  const hasNoUsers = !users || users.length === 0
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
@@ -116,6 +133,24 @@ export function LoginPage() {
               Forgot your email?
             </Button>
           </div>
+          
+          {hasNoUsers && (
+            <div className="mt-6 pt-6 border-t">
+              <div className="text-center space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  No user accounts found in the system
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowResetConfirm(true)}
+                  className="w-full gap-2"
+                >
+                  <ArrowCounterClockwise size={18} />
+                  Run Setup Wizard
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -173,6 +208,24 @@ export function LoginPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Run Setup Wizard?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will delete all data including neighbors, payments, expenses, users, and system configuration. 
+              You will be returned to the setup wizard to start fresh. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetSetup} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Reset Everything
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
