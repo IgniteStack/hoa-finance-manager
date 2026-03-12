@@ -9,6 +9,7 @@ import { NeighborManager } from '@/components/neighbors/NeighborManager'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
 import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
+import { SyncIndicator } from '@/components/SyncIndicator'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List } from '@phosphor-icons/react'
@@ -148,6 +149,7 @@ function App() {
   return (
     <AuthProvider>
       <AppContent />
+      <SyncIndicator />
       <Toaster />
     </AuthProvider>
   )

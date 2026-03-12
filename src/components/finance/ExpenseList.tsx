@@ -70,7 +70,6 @@ export function ExpenseList() {
     } else {
       const newExpense: Expense = {
         id: Date.now().toString(),
-        type: 'expense',
         concept: formData.concept,
         amount: parseFloat(formData.amount),
         date: formData.date,
