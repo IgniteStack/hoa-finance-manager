@@ -1,5 +1,5 @@
 export function generatePassword(length: number = 12): string {
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz'
   const lowercase = 'abcdefghijklmnopqrstuvwxyz'
   const numbers = '0123456789'
   const symbols = '!@#$%^&*'
@@ -22,6 +22,15 @@ export function generatePassword(length: number = 12): string {
 export function hashPassword(password: string): string {
   return btoa(password)
 }
+
+
+
+
+
+
+
+
+
 
 export function verifyPassword(password: string, hashedPassword: string): boolean {
   return btoa(password) === hashedPassword
