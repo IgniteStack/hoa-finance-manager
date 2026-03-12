@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/but
+import { useKV } from '@github/spark/hooks'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/co
-import { hashPassword, verifyPassword } from 
-import { ArrowLeft, CheckCircle } from '@phosphor-icons/react'
-interface ForgotPasswordDialogProps {
-  onClose: () => void
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { User } from '@/lib/types'
 import { hashPassword, verifyPassword } from '@/lib/password-utils'
 import { toast } from 'sonner'
 import { ArrowLeft, CheckCircle } from '@phosphor-icons/react'
@@ -15,26 +15,26 @@ interface ForgotPasswordDialogProps {
   onClose: () => void
 }
 
-    setNewPassword('')
+type Step = 'email' | 'security' | 'password' | 'success'
 
-  }
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    setError('')
-    const user = (users || []).find(u =>
-    if (!user) {
-      return
+export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProps) {
+  const [users, setUsers] = useKV<User[]>('users', [])
+  const [step, setStep] = useState<Step>('email')
+  const [email, setEmail] = useState('')
+  const [securityAnswer, setSecurityAnswer] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [foundUser, setFoundUser] = useState<User | null>(null)
 
-      setError('This account does not have a security questi
-    }
-
-  }
-  const handleSecuri
-    setError('')
-    if (!foundUser || 
-      return
+  const handleClose = () => {
+    setStep('email')
+    setEmail('')
+    setSecurityAnswer('')
     setNewPassword('')
     setConfirmPassword('')
     setError('')
+    setFoundUser(null)
     onClose()
   }
 
@@ -55,123 +55,126 @@ interface ForgotPasswordDialogProps {
     }
 
     setFoundUser(user)
-
-   
-
+    setStep('security')
   }
+
+  const handleSecuritySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (!foundUser || !foundUser.securityAnswer) {
+      setError('Invalid session. Please start over.')
+      return
+    }
+
+    const isValid = await verifyPassword(securityAnswer, foundUser.securityAnswer)
+    
+    if (!isValid) {
+      setError('Incorrect answer. Please try again.')
+      return
+    }
+
+    setStep('password')
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters')
+      return
+    }
+
+    if (!foundUser) {
+      setError('Invalid session. Please start over.')
+      return
+    }
+
+    const hashedPassword = await hashPassword(newPassword)
+    
+    setUsers((currentUsers) =>
+      (currentUsers || []).map(u =>
+        u.id === foundUser.id
+          ? { ...u, password: hashedPassword, mustChangePassword: false }
+          : u
+      )
+    )
+
+    toast.success('Password reset successfully')
+    setStep('success')
+  }
+
+  const handleBackToEmail = () => {
+    setStep('email')
+    setSecurityAnswer('')
+    setError('')
+  }
+
+  const handleBackToSecurity = () => {
+    setStep('security')
+    setNewPassword('')
+    setConfirmPassword('')
+    setError('')
+  }
+
   return (
-      <DialogCon
-
-            {step === 'security' && 'Security Ques
-            {step === 'success' && 'Password R
-          <D
-     
-
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {step === 'email' && 'Forgot Password'}
+            {step === 'security' && 'Security Question'}
+            {step === 'password' && 'Reset Password'}
+            {step === 'success' && 'Password Reset'}
+          </DialogTitle>
         </DialogHeader>
-    
-            <div cl
+
+        {step === 'email' && (
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
               <Input
-            
-     
-
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                autoFocus
+              />
             </div>
-   
 
-            )}
-            <Button ty
-            </Bu
-
-        {step === 'security' && f
-            <div className="p-3 rounded-lg bg-muted/50 border
-            
-
-
-                id="security-answer"
-                value={securityAnswer}
-            
-     
-
-              </p>
-
+            {error && (
               <Alert variant="destructive">
-    
-
-              <Button type="but
-                Back
-              <Button type="submit" className="flex-1">
-             
-       
-
-
-              <Label htmlFor="new-password">New P
-                id="ne
-   
-
-              />
-
-              <Label html
-                id="
-   
-
-              />
-
-              <Alert v
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
+            )}
 
-   
-
-          
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
+                Cancel
               </Button>
-          </form>
-
-          <div classNam
-              <div className="bg-accent/20 text-acc
-              </div>
-                Your password has been reset successf
+              <Button type="submit" className="flex-1">
+                Continue
+              </Button>
             </div>
-            <Button onCl
-            </Button>
+          </form>
         )}
-    </Dialog>
-}
 
-
-
-
-
+        {step === 'security' && foundUser && (
+          <form onSubmit={handleSecuritySubmit} className="space-y-4">
+            <div className="p-3 rounded-lg bg-muted/50 border">
+              <p className="text-sm font-medium mb-1">Security Question:</p>
+              <p className="text-sm text-muted-foreground">{foundUser.securityQuestion}</p>
+            </div>
 
             <div className="space-y-2">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
               <Label htmlFor="security-answer">Your Answer</Label>
               <Input
                 id="security-answer"
@@ -181,6 +184,7 @@ interface ForgotPasswordDialogProps {
                 placeholder="Enter your answer"
                 required
                 autoComplete="off"
+                autoFocus
               />
               <p className="text-xs text-muted-foreground">
                 Answer is not case-sensitive
@@ -216,6 +220,7 @@ interface ForgotPasswordDialogProps {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={8}
+                autoFocus
               />
             </div>
 
@@ -267,5 +272,5 @@ interface ForgotPasswordDialogProps {
         )}
       </DialogContent>
     </Dialog>
-
+  )
 }
