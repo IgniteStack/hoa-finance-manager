@@ -18,8 +18,10 @@ import { SyncIndicator } from '@/components/SyncIndicator'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear, User as UserIcon, Key, ShieldCheck } from '@phosphor-icons/react'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear, User as UserIcon, Key, ShieldCheck, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
+import { toast } from 'sonner'
 
 type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'users'
 
@@ -30,6 +32,18 @@ function AppContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showPasswordChange, setShowPasswordChange] = useState(false)
   const [showSecurityQuestion, setShowSecurityQuestion] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
+
+  const handleResetSetup = async () => {
+    const keys = await window.spark.kv.keys()
+    for (const key of keys) {
+      await window.spark.kv.delete(key)
+    }
+    toast.success('System reset complete. Reloading...')
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  }
 
   if (!systemConfig?.isSetupComplete) {
     return <SetupWizard />
@@ -155,6 +169,18 @@ function AppContent() {
                   Security Question
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {isAdmin && (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => setShowResetConfirm(true)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <ArrowCounterClockwise size={16} className="mr-2" />
+                      Reset Setup
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem onClick={logout}>
                   <SignOut size={16} className="mr-2" />
                   Sign Out
@@ -208,6 +234,24 @@ function AppContent() {
           userId={user.id}
         />
       )}
+
+      <AlertDialog open={showResetConfirm} onOpenChange={setShowResetConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Setup Wizard?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will delete all data including neighbors, payments, expenses, users, and system configuration. 
+              You will be returned to the setup wizard to start fresh. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleResetSetup} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Reset Everything
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
