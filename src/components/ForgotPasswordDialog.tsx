@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/but
+import { useKV } from '@github/spark/hooks'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/co
-import { Label } from '@/components/ui/label'
-
-  open: boolean
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { User } from '@/lib/types'
-import { hashPassword } from '@/lib/password-utils'
+import { hashPassword, verifyPassword } from '@/lib/password-utils'
+import { toast } from 'sonner'
 import { ArrowLeft, CheckCircle } from '@phosphor-icons/react'
 
 interface ForgotPasswordDialogProps {
   open: boolean
   onClose: () => void
- 
+}
 
 type Step = 'email' | 'security' | 'password' | 'success'
 
@@ -30,108 +31,111 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
     setStep('email')
     setEmail('')
     setFoundUser(null)
-    }
-    
-      setError('Incorrect 
-    }
-    setStep('
+    setSecurityAnswer('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setError('')
+    onClose()
+  }
 
-
-
-      setError('Passwo
-    }
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
 
     const user = (users || []).find(u => u.email.toLowerCase() === email.toLowerCase())
     
-
-    
-      return
-     
-
-
-  }
-  const hand
-    s
-
-
-    setStep('security')
-  }
-
-  return (
-      <DialogContent c
-          <Dialo
-
-            {step === 'suc
-
-            {step === 'security' && 'Answer your security question to verify you
-    
-        </DialogHeader>
-        {step === 'email' && (
-            
-     
-
-                onChang
-   
-
-            {error && (
-                <Alert
-            )}
-
-    if (newPassword.length < 8) {
-        )}
+    if (!user) {
+      setError('No account found with this email address')
       return
     }
 
+    if (!user.securityQuestion || !user.securityAnswer) {
+      setError('This account does not have a security question set up. Please contact an administrator.')
+      return
+    }
 
-              <Label htmlFor="security-a
-            
-     
-
-                autoComple
-
-              </p>
-
-    setUsers((current) =>
-              </Alert>
-
-              <Button type="button" variant="o
-             
-       
-     
-
-
+    setFoundUser(user)
+    setStep('security')
   }
 
-                id="new-password"
-                valu
-                requir
-              />
+  const handleSecuritySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
 
-   
+    if (!foundUser || !foundUser.securityAnswer) {
+      setError('Security verification failed')
+      return
+    }
 
-                value={confirmPassword
+    const isValid = await verifyPassword(securityAnswer.toLowerCase().trim(), foundUser.securityAnswer)
+    
+    if (!isValid) {
+      setError('Incorrect answer. Please try again.')
+      return
+    }
+
+    setStep('password')
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters long')
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (!foundUser) return
+
+    const hashedPassword = await hashPassword(newPassword)
+    
+    setUsers((current) =>
+      (current || []).map(u => 
+        u.id === foundUser.id 
+          ? { ...u, password: hashedPassword, mustChangePassword: false }
+          : u
+      )
+    )
+
+    toast.success('Password reset successfully!')
+    setStep('success')
+  }
+
+  const handleBackToEmail = () => {
+    setError('')
+    setSecurityAnswer('')
+    setStep('email')
+  }
+
+  const handleBackToSecurity = () => {
+    setError('')
+    setNewPassword('')
+    setConfirmPassword('')
     setStep('security')
-              />
-
-              <A
-   
+  }
 
   return (
-                Back
-              <Button type="submit" classN
-              </Button
-          </form>
-
-          <div className="space-y-4">
-              <div className="bg-accent/20 text-accent p-4
-              </div>
-                Your pas
-            </div>
-            <Button onClick={handleClose} className="w-full">
-            </Button>
-        )}
-    </Dialog>
-}
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {step === 'email' && 'Forgot Password'}
+            {step === 'security' && 'Security Question'}
+            {step === 'password' && 'Reset Password'}
+            {step === 'success' && 'Password Reset Successful'}
+          </DialogTitle>
+          <DialogDescription>
+            {step === 'email' && 'Enter your email address to begin the password recovery process.'}
+            {step === 'security' && 'Answer your security question to verify your identity.'}
+            {step === 'password' && 'Choose a new password for your account.'}
+            {step === 'success' && 'Your password has been successfully reset.'}
+          </DialogDescription>
         </DialogHeader>
 
         {step === 'email' && (
@@ -263,5 +267,5 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
         )}
       </DialogContent>
     </Dialog>
-
+  )
 }
