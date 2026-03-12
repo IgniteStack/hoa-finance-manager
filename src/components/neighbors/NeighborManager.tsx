@@ -109,13 +109,13 @@ export function NeighborManager() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <CardTitle>Neighbors</CardTitle>
             <CardDescription>Manage community residents and their information</CardDescription>
           </div>
           {isAdmin && (
-            <Button onClick={handleAdd}>
+            <Button onClick={handleAdd} className="w-full sm:w-auto">
               <Plus className="mr-2" size={18} />
               Add Neighbor
             </Button>
@@ -146,53 +146,97 @@ export function NeighborManager() {
             )}
           </div>
         ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>House</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Ownership</TableHead>
-                  <TableHead>Status</TableHead>
-                  {isAdmin && <TableHead className="text-right">Actions</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredNeighbors.map((neighbor) => (
-                  <TableRow key={neighbor.id}>
-                    <TableCell className="font-medium">
-                      {`${neighbor.firstName} ${neighbor.lastName}`.trim()}
-                    </TableCell>
-                    <TableCell className="font-mono">{neighbor.houseNumber}</TableCell>
-                    <TableCell className="font-mono text-sm">{neighbor.phoneNumber}</TableCell>
-                    <TableCell>
-                      <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
-                        {neighbor.ownershipStatus}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={neighbor.isActive ? 'default' : 'destructive'}>
-                        {neighbor.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(neighbor)}>
-                            <PencilSimple size={18} />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(neighbor.id)}>
-                            <Trash size={18} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
+          <>
+            <div className="hidden md:block rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>House</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Ownership</TableHead>
+                    <TableHead>Status</TableHead>
+                    {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredNeighbors.map((neighbor) => (
+                    <TableRow key={neighbor.id}>
+                      <TableCell className="font-medium">
+                        {`${neighbor.firstName} ${neighbor.lastName}`.trim()}
+                      </TableCell>
+                      <TableCell className="font-mono">{neighbor.houseNumber}</TableCell>
+                      <TableCell className="font-mono text-sm">{neighbor.phoneNumber}</TableCell>
+                      <TableCell>
+                        <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
+                          {neighbor.ownershipStatus}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={neighbor.isActive ? 'default' : 'destructive'}>
+                          {neighbor.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      {isAdmin && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(neighbor)}>
+                              <PencilSimple size={18} />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(neighbor.id)}>
+                              <Trash size={18} />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            <div className="md:hidden space-y-3">
+              {filteredNeighbors.map((neighbor) => (
+                <Card key={neighbor.id}>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="font-medium text-base">
+                          {`${neighbor.firstName} ${neighbor.lastName}`.trim()}
+                        </div>
+                        <div className="text-sm text-muted-foreground font-mono">
+                          House {neighbor.houseNumber}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'} className="text-xs">
+                          {neighbor.ownershipStatus}
+                        </Badge>
+                        <Badge variant={neighbor.isActive ? 'default' : 'destructive'} className="text-xs">
+                          {neighbor.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground font-mono mb-3">
+                      {neighbor.phoneNumber}
+                    </div>
+                    {isAdmin && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleEdit(neighbor)} className="flex-1">
+                          <PencilSimple size={16} className="mr-1" />
+                          Edit
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDelete(neighbor.id)} className="flex-1">
+                          <Trash size={16} className="mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
         )}
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -205,7 +249,7 @@ export function NeighborManager() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name *</Label>
                     <Input
@@ -237,7 +281,7 @@ export function NeighborManager() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="houseNumber">House Number *</Label>
                     <Select
@@ -294,11 +338,11 @@ export function NeighborManager() {
                   <Label htmlFor="isActive">Active</Label>
                 </div>
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <DialogFooter className="flex-col sm:flex-row gap-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
                   Cancel
                 </Button>
-                <Button type="submit">
+                <Button type="submit" className="w-full sm:w-auto">
                   {editingNeighbor ? 'Update' : 'Add'} Neighbor
                 </Button>
               </DialogFooter>

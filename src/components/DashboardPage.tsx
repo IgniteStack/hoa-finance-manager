@@ -9,10 +9,10 @@ export function DashboardPage() {
   const [payments] = useKV<Payment[]>('payments', [])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <p className="text-muted-foreground">Community financial overview and analytics</p>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h2>
+        <p className="text-sm md:text-base text-muted-foreground">Community financial overview and analytics</p>
       </div>
 
       <StatsCards 

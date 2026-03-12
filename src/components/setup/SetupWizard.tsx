@@ -99,10 +99,10 @@ export function SetupWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4 md:p-6">
       <Card className="max-w-2xl w-full">
         <CardHeader>
-          <CardTitle className="text-3xl">Welcome to HOA Finance Manager</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl">Welcome to HOA Finance Manager</CardTitle>
           <CardDescription>
             Let's set up your community management system
           </CardDescription>
@@ -149,7 +149,7 @@ export function SetupWizard() {
               <div>
                 <h3 className="text-lg font-semibold mb-4">First Administrator</h3>
                 <div className="grid gap-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input
@@ -168,7 +168,7 @@ export function SetupWizard() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="houseNumber">House Number *</Label>
                       <Input
@@ -256,7 +256,7 @@ export function SetupWizard() {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start Date *</Label>
                       <Input
@@ -279,12 +279,12 @@ export function SetupWizard() {
                 </div>
               </div>
 
-              <div className="flex justify-between">
-                <Button onClick={() => setStep(1)} variant="outline" size="lg">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button onClick={() => setStep(1)} variant="outline" size="lg" className="w-full sm:w-auto">
                   <ArrowLeft className="mr-2" size={18} />
                   Back
                 </Button>
-                <Button onClick={handlePeriodSubmit} size="lg">
+                <Button onClick={handlePeriodSubmit} size="lg" className="w-full sm:w-auto">
                   Complete Setup
                   <CheckCircle className="ml-2" size={18} />
                 </Button>

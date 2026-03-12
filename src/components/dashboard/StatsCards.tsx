@@ -35,14 +35,14 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
   }, [neighbors, expenses, payments, startDate, endDate])
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Income</CardTitle>
           <CurrencyDollar className="text-accent" size={20} weight="fill" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-mono font-bold text-foreground">
+          <div className="text-xl md:text-2xl font-mono font-bold text-foreground">
             ${stats.totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -57,7 +57,7 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
           <Receipt className="text-destructive" size={20} weight="fill" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-mono font-bold text-foreground">
+          <div className="text-xl md:text-2xl font-mono font-bold text-foreground">
             ${stats.totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -72,7 +72,7 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
           <TrendUp className="text-primary" size={20} weight="fill" />
         </CardHeader>
         <CardContent>
-          <div className={`text-2xl font-mono font-bold ${stats.balance >= 0 ? 'text-accent' : 'text-destructive'}`}>
+          <div className={`text-xl md:text-2xl font-mono font-bold ${stats.balance >= 0 ? 'text-accent' : 'text-destructive'}`}>
             ${Math.abs(stats.balance).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -87,7 +87,7 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
           <Users className="text-primary" size={20} weight="fill" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-mono font-bold text-foreground">
+          <div className="text-xl md:text-2xl font-mono font-bold text-foreground">
             {stats.activeNeighbors}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
