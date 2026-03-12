@@ -23,7 +23,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
@@ -39,7 +39,7 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
 
     if (!user) return
 
-    const hashedPassword = hashPassword(newPassword)
+    const hashedPassword = await hashPassword(newPassword)
     
     setUsers((current) =>
       (current || []).map(u => 

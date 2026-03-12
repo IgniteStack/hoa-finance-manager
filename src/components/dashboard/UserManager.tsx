@@ -50,9 +50,9 @@ export function UserManager() {
     toast.success('User deleted successfully')
   }
 
-  const handleResetPassword = (user: User) => {
+  const handleResetPassword = async (user: User) => {
     const newPassword = generatePassword()
-    const hashedPassword = hashPassword(newPassword)
+    const hashedPassword = await hashPassword(newPassword)
     
     setUsers((current) =>
       (current || []).map(u => 
@@ -68,11 +68,11 @@ export function UserManager() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const password = generatePassword()
-    const hashedPassword = hashPassword(password)
+    const hashedPassword = await hashPassword(password)
 
     const newUser: User = {
       id: Date.now().toString(),

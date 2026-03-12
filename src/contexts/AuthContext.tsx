@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: false }
     }
 
-    const isValid = verifyPassword(password, foundUser.password)
+    const isValid = await verifyPassword(password, foundUser.password)
     
     if (isValid) {
       const userToSet = { ...foundUser }
