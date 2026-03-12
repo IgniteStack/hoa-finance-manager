@@ -1,43 +1,38 @@
 export type UserRole = 'admin' | 'neighbor'
 
-export type OwnershipStatus = 'owner' | 'tenant'
-
-export type RecordStatus = 'active' | 'reversed' | 'draft'
-
-export type PeriodType = 'monthly' | 'annual'
+export type RecordStatus = 'active' | 'reversed'
 
 export interface User {
-  id: string
-  email: string
-  role: UserRole
-  houseNumber?: number
-  neighborId?: string
-  createdAt: string
-}
 
-export interface Neighbor {
+  houseNumber?: number
+
+
   id: string
-  firstName: string
-  lastName: string
-  email: string
-  houseNumber: number
-  phoneNumber?: string
-  ownershipStatus: OwnershipStatus
-  isActive: boolean
+  lastName: str
+  houseNumber: n
+  ownershipStatus: Own
   balance: number
-  createdAt: string
 }
+e
+
+  concept: string
+  notes?: st
+  neighborId?: stri
+  status: RecordSt
+  createdAt: st
+
+  id: string
+  type: PeriodTyp
+  endDate: string
+ 
 
 export interface Transaction {
   id: string
   type: 'income' | 'expense'
   amount: number
   concept: string
-  date: string
-  notes?: string
   houseNumber?: number
   neighborId?: string
-  fiscalPeriodId?: string
   status: RecordStatus
   reversedAt?: string
   createdAt: string
@@ -45,13 +40,10 @@ export interface Transaction {
 
 export interface FiscalPeriod {
   id: string
-  name: string
   type: PeriodType
   startDate: string
   endDate: string
-  isClosed: boolean
   closedAt?: string
-  createdAt: string
 }
 
 export interface PaymentRecord {
@@ -60,34 +52,22 @@ export interface PaymentRecord {
   houseNumber: number
   amount: number
   concept?: string
-  date: string
-  bankAccount?: string
-  fiscalPeriodId?: string
   status: RecordStatus
   reversedAt?: string
   createdAt: string
-}
+} isSetupComplete: boolean
+  totalHouses: number
 
-export type Payment = PaymentRecord
+: string
 
-export type Expense = Transaction & { type: 'expense' }
 
-export interface DashboardStats {
-  totalIncome: number
+AuthState {
+
+olean
+
+export interface DashboardStats {  totalIncome: number
   totalExpenses: number
   balance: number
   activeNeighbors: number
   pendingPayments: number
-}
-
-export interface SystemConfig {
-  isSetupComplete: boolean
-  totalHouses: number
-  hoaName?: string
-  createdAt?: string
-}
-
-export interface AuthState {
-  user: User | null
-  isAuthenticated: boolean
-}
+export interface SystemConfig {  isSetupComplete: boolean  totalHouses: number  hoaName?: string  createdAt?: string}export interface AuthState {  user: User | null  isAuthenticated: boolean
