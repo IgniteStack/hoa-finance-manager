@@ -26,12 +26,3 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   const passwordHash = await hashPassword(password)
   return passwordHash === hash
 }
-
-
-
-
-
-
-
-
-
