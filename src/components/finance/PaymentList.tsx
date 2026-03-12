@@ -49,7 +49,7 @@ export function PaymentList({ neighbors }: PaymentListProps) {
   const handleEdit = (payment: Payment) => {
     setEditingPayment(payment)
     setFormData({
-      concept: payment.concept,
+      concept: payment.concept || '',
       amount: payment.amount.toString(),
       date: payment.date,
       neighborId: payment.neighborId,

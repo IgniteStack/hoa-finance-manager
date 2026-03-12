@@ -17,6 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (email === 'admin@hoa.com' && password === 'admin123') {
       setUser((currentUser) => ({
         id: '1',
+        firstName: 'Admin',
         email: 'admin@hoa.com',
         role: 'admin'
       }))
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else if (email === 'neighbor@hoa.com' && password === 'neighbor123') {
       setUser((currentUser) => ({
         id: '2',
+        firstName: 'Neighbor',
         email: 'neighbor@hoa.com',
         role: 'neighbor',
         neighborId: 'n1'

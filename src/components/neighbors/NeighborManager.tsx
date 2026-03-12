@@ -66,7 +66,7 @@ export function NeighborManager() {
       houseNumber: neighbor.houseNumber,
       phoneNumber: neighbor.phoneNumber,
       ownershipStatus: neighbor.ownershipStatus,
-      roleType: neighbor.roleType,
+      roleType: neighbor.roleType || '',
       active: neighbor.active
     })
     setIsDialogOpen(true)
