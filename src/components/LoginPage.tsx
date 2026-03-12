@@ -137,16 +137,21 @@ export function LoginPage() {
           {hasNoUsers && (
             <div className="mt-6 pt-6 border-t">
               <div className="text-center space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  No user accounts found in the system
-                </p>
+                <div className="bg-accent/20 border-2 border-accent rounded-lg p-4 space-y-2">
+                  <p className="text-sm font-semibold text-accent-foreground">
+                    No user accounts found
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    The setup wizard didn't create login accounts. Run the wizard again to set up your system properly.
+                  </p>
+                </div>
                 <Button 
-                  variant="outline" 
+                  variant="default" 
                   onClick={() => setShowResetConfirm(true)}
                   className="w-full gap-2"
                 >
                   <ArrowCounterClockwise size={18} />
-                  Run Setup Wizard
+                  Run Setup Wizard Again
                 </Button>
               </div>
             </div>
