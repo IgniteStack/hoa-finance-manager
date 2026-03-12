@@ -26,25 +26,25 @@ export function NeighborManager() {
 
   const [formData, setFormData] = useState({
     firstName: '',
-    secondName: '',
     lastName: '',
-    secondLastName: '',
+    email: '',
     houseNumber: '',
     phoneNumber: '',
     ownershipStatus: 'owner' as OwnershipStatus,
-    active: true
+    isActive: true,
+    balance: 0
   })
 
   const resetForm = () => {
     setFormData({
       firstName: '',
-      secondName: '',
       lastName: '',
-      secondLastName: '',
+      email: '',
       houseNumber: '',
       phoneNumber: '',
       ownershipStatus: 'owner',
-      active: true
+      isActive: true,
+      balance: 0
     })
     setEditingNeighbor(null)
   }
@@ -58,13 +58,13 @@ export function NeighborManager() {
     setEditingNeighbor(neighbor)
     setFormData({
       firstName: neighbor.firstName,
-      secondName: neighbor.secondName || '',
       lastName: neighbor.lastName,
-      secondLastName: neighbor.secondLastName || '',
+      email: neighbor.email,
       houseNumber: neighbor.houseNumber,
       phoneNumber: neighbor.phoneNumber,
       ownershipStatus: neighbor.ownershipStatus,
-      active: neighbor.active
+      isActive: neighbor.isActive,
+      balance: neighbor.balance
     })
     setIsDialogOpen(true)
   }
@@ -161,7 +161,7 @@ export function NeighborManager() {
                 {filteredNeighbors.map((neighbor) => (
                   <TableRow key={neighbor.id}>
                     <TableCell className="font-medium">
-                      {`${neighbor.firstName} ${neighbor.secondName || ''} ${neighbor.lastName} ${neighbor.secondLastName || ''}`.trim()}
+                      {`${neighbor.firstName} ${neighbor.lastName}`.trim()}
                     </TableCell>
                     <TableCell className="font-mono">{neighbor.houseNumber}</TableCell>
                     <TableCell className="font-mono text-sm">{neighbor.phoneNumber}</TableCell>
@@ -171,8 +171,8 @@ export function NeighborManager() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={neighbor.active ? 'default' : 'destructive'}>
-                        {neighbor.active ? 'Active' : 'Inactive'}
+                      <Badge variant={neighbor.isActive ? 'default' : 'destructive'}>
+                        {neighbor.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </TableCell>
                     {isAdmin && (
@@ -215,17 +215,6 @@ export function NeighborManager() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="secondName">Second Name</Label>
-                    <Input
-                      id="secondName"
-                      value={formData.secondName}
-                      onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name *</Label>
                     <Input
                       id="lastName"
@@ -234,14 +223,17 @@ export function NeighborManager() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="secondLastName">Second Last Name</Label>
-                    <Input
-                      id="secondLastName"
-                      value={formData.secondLastName}
-                      onChange={(e) => setFormData({ ...formData, secondLastName: e.target.value })}
-                    />
-                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -294,11 +286,11 @@ export function NeighborManager() {
 
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="active"
-                    checked={formData.active}
-                    onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
+                    id="isActive"
+                    checked={formData.isActive}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
                   />
-                  <Label htmlFor="active">Active</Label>
+                  <Label htmlFor="isActive">Active</Label>
                 </div>
               </div>
               <DialogFooter>

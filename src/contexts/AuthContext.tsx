@@ -15,20 +15,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     if (email === 'admin@hoa.com' && password === 'admin123') {
-      setUser((currentUser) => ({
+      setUser(() => ({
         id: '1',
         firstName: 'Admin',
+        lastName: 'User',
         email: 'admin@hoa.com',
-        role: 'admin'
+        role: 'admin',
+        phoneNumber: '',
+        createdAt: new Date().toISOString()
       }))
       return true
     } else if (email === 'neighbor@hoa.com' && password === 'neighbor123') {
-      setUser((currentUser) => ({
+      setUser(() => ({
         id: '2',
         firstName: 'Neighbor',
+        lastName: 'User',
         email: 'neighbor@hoa.com',
         role: 'neighbor',
-        neighborId: 'n1'
+        neighborId: 'n1',
+        phoneNumber: '',
+        createdAt: new Date().toISOString()
       }))
       return true
     }
@@ -36,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    setUser((currentUser) => null)
+    setUser(null)
   }
 
   const currentUser = user ?? null

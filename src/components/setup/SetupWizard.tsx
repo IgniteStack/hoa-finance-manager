@@ -60,10 +60,12 @@ export function SetupWizard() {
       id: 'admin-1',
       firstName: adminData.firstName,
       lastName: adminData.lastName,
+      email: adminData.email,
       houseNumber: adminData.houseNumber,
       phoneNumber: adminData.phoneNumber,
       ownershipStatus: 'owner',
-      active: true,
+      isActive: true,
+      balance: 0,
       createdAt: new Date().toISOString()
     }
 
@@ -83,7 +85,7 @@ export function SetupWizard() {
     setSystemConfig({
       isSetupComplete: true,
       totalHouses: parseInt(totalHouses),
-      setupCompletedAt: new Date().toISOString()
+      createdAt: new Date().toISOString()
     })
 
     setAuthUser(() => ({

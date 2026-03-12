@@ -29,7 +29,7 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
     const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0)
     const totalIncome = filteredPayments.reduce((sum, pay) => sum + pay.amount, 0)
     const balance = totalIncome - totalExpenses
-    const activeNeighbors = neighbors.filter(n => n.active).length
+    const activeNeighbors = neighbors.filter(n => n.isActive).length
 
     return { totalExpenses, totalIncome, balance, activeNeighbors }
   }, [neighbors, expenses, payments, startDate, endDate])
