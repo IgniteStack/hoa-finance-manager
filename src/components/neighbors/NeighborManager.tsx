@@ -60,8 +60,8 @@ export function NeighborManager() {
       firstName: neighbor.firstName,
       lastName: neighbor.lastName,
       email: neighbor.email,
-      houseNumber: neighbor.houseNumber,
-      phoneNumber: neighbor.phoneNumber,
+      houseNumber: neighbor.houseNumber.toString(),
+      phoneNumber: neighbor.phoneNumber || '',
       ownershipStatus: neighbor.ownershipStatus,
       isActive: neighbor.isActive,
       balance: neighbor.balance
@@ -80,7 +80,7 @@ export function NeighborManager() {
     if (editingNeighbor) {
       setNeighbors((current) => 
         (current || []).map(n => n.id === editingNeighbor.id 
-          ? { ...editingNeighbor, ...formData }
+          ? { ...editingNeighbor, ...formData, houseNumber: parseInt(formData.houseNumber) }
           : n
         )
       )
@@ -89,6 +89,7 @@ export function NeighborManager() {
       const newNeighbor: Neighbor = {
         id: Date.now().toString(),
         ...formData,
+        houseNumber: parseInt(formData.houseNumber),
         createdAt: new Date().toISOString()
       }
       setNeighbors((current) => [...(current || []), newNeighbor])
@@ -102,7 +103,7 @@ export function NeighborManager() {
   const filteredNeighbors = (neighbors || []).filter(n => 
     searchQuery === '' ||
     `${n.firstName} ${n.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    n.houseNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    n.houseNumber.toString().toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (

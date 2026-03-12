@@ -2,72 +2,75 @@ export type UserRole = 'admin' | 'neighbor'
 
 export type OwnershipStatus = 'owner' | 'tenant'
 
-  firstName: string
+export type RecordStatus = 'active' | 'reversed' | 'draft'
 
-  neighborId?: string
-  createdAt:
+export type PeriodType = 'monthly' | 'annual'
 
+export interface User {
   id: string
-  firstName: st
   email: string
-  ownershipStatus: Ow
+  role: UserRole
+  houseNumber?: number
+  neighborId?: string
+  createdAt: string
+}
+
+export interface Neighbor {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  houseNumber: number
+  phoneNumber?: string
+  ownershipStatus: OwnershipStatus
+  isActive: boolean
   balance: number
   createdAt: string
-e
+}
 
+export interface Transaction {
+  id: string
+  type: 'income' | 'expense'
+  amount: number
   concept: string
-  status: Re
+  date: string
+  notes?: string
+  houseNumber?: number
+  neighborId?: string
+  fiscalPeriodId?: string
+  status: RecordStatus
   reversedAt?: string
   createdAt: string
-
-
-  id: string
-  type: PeriodType
-  endDate: string
-  closedAt?: stri
 }
-e
 
+export interface FiscalPeriod {
+  id: string
+  name: string
+  type: PeriodType
+  startDate: string
+  endDate: string
+  isClosed: boolean
+  closedAt?: string
+  createdAt: string
+}
+
+export interface PaymentRecord {
+  id: string
+  neighborId: string
+  houseNumber: number
+  amount: number
   concept?: string
-  houseNumbe
-  status: Record
-  reversedAt?:
-  createdAt: stri
+  date: string
+  bankAccount?: string
+  fiscalPeriodId?: string
+  status: RecordStatus
+  reversedAt?: string
+  createdAt: string
+}
 
-  totalIncome: number
-  balance: number
-  pendingPayments: nu
+export type Payment = PaymentRecord
 
-  isSetupComplete: 
- 
-
-export interface AuthState {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export type Expense = Transaction & { type: 'expense' }
 
 export interface DashboardStats {
   totalIncome: number
