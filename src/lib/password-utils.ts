@@ -1,6 +1,6 @@
 export function generatePassword(length: number = 12): string {
   const lowercase = 'abcdefghijklmnopqrstuvwxyz'
-  const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const numbers = '0123456789'
   const symbols = '!@#$%^&*'
   
