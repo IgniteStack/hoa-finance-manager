@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Neighbor } from '@/lib/types'
+import { useNotifications } from '@/contexts/NotificationContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -26,6 +28,8 @@ export function MessagingPage() {
   const [body, setBody] = useState('')
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>([])
   const [recipientMode, setRecipientMode] = useState<'all' | 'selective'>('all')
+  const { addNotification } = useNotifications()
+  const { users } = useAuth()
 
   const activeNeighbors = (neighbors || []).filter(n => n.isActive)
 
@@ -64,13 +68,30 @@ export function MessagingPage() {
     }
 
     setMessages(prev => [newMessage, ...(prev || [])])
+
+    recipients.forEach(neighborId => {
+      const neighbor = activeNeighbors.find(n => n.id === neighborId)
+      if (neighbor) {
+        const neighborUser = (users || []).find(u => u.email === neighbor.email)
+        if (neighborUser) {
+          addNotification({
+            userId: neighborUser.id,
+            type: 'message',
+            title: subject,
+            body: body.substring(0, 100) + (body.length > 100 ? '...' : ''),
+            read: false,
+            relatedId: newMessage.id
+          })
+        }
+      }
+    })
     
     setSubject('')
     setBody('')
     setSelectedRecipients([])
     setRecipientMode('all')
 
-    toast.success(`Message sent to ${recipients.length} recipient${recipients.length > 1 ? 's' : ''}`)
+    toast.success(`Message sent to ${recipients.length} recipient${recipients.length > 1 ? 's' : ''} with notifications`)
   }
 
   return (

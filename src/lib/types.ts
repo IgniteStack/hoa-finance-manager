@@ -14,6 +14,8 @@ export interface User {
   role: UserRole
   phoneNumber?: string
   neighborId?: string
+  password?: string
+  mustChangePassword?: boolean
   createdAt: string
 }
 
@@ -87,4 +89,15 @@ export interface DashboardStats {
   balance: number
   activeNeighbors: number
   pendingPayments: number
+}
+
+export interface Notification {
+  id: string
+  userId: string
+  type: 'message' | 'payment' | 'expense' | 'system'
+  title: string
+  body: string
+  read: boolean
+  relatedId?: string
+  createdAt: string
 }

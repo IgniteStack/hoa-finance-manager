@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
 import { House } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -11,16 +12,22 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    const success = await login(email, password)
+    const result = await login(email, password)
     
-    if (success) {
-      toast.success('Welcome back!')
+    if (result.success) {
+      if (result.mustChangePassword) {
+        setShowPasswordChange(true)
+        toast.info('Please change your password')
+      } else {
+        toast.success('Welcome back!')
+      }
     } else {
       toast.error('Invalid credentials')
     }
@@ -30,6 +37,11 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+      <ChangePasswordDialog 
+        open={showPasswordChange} 
+        onClose={() => setShowPasswordChange(false)} 
+      />
+      
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
@@ -49,7 +61,7 @@ export function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@hoa.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -70,13 +82,6 @@ export function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-2 text-sm">
-            <p className="font-medium">Demo Credentials:</p>
-            <div className="space-y-1 text-muted-foreground">
-              <p><strong>Admin:</strong> admin@hoa.com / admin123</p>
-              <p><strong>Neighbor:</strong> neighbor@hoa.com / neighbor123</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

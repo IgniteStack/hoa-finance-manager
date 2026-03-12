@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { SystemConfig } from '@/lib/types'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { NotificationProvider } from '@/contexts/NotificationContext'
 import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
@@ -9,19 +10,23 @@ import { NeighborManager } from '@/components/neighbors/NeighborManager'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
 import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
+import { UserManager } from '@/components/dashboard/UserManager'
+import { NotificationBell } from '@/components/NotificationBell'
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
 import { SyncIndicator } from '@/components/SyncIndicator'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List } from '@phosphor-icons/react'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 
-type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods'
+type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'users'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
   const [systemConfig] = useKV<SystemConfig>('system-config', { isSetupComplete: false, totalHouses: 0 })
   const [currentPage, setCurrentPage] = useState<Page>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
 
   if (!systemConfig?.isSetupComplete) {
     return <SetupWizard />
@@ -29,6 +34,17 @@ function AppContent() {
 
   if (!isAuthenticated) {
     return <LoginPage />
+  }
+
+  if (user?.mustChangePassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        <ChangePasswordDialog 
+          open={true} 
+          onClose={() => {}} 
+        />
+      </div>
+    )
   }
 
   const navigateTo = (page: Page) => {
@@ -73,14 +89,24 @@ function AppContent() {
         Finance
       </Button>
       {isAdmin && (
-        <Button
-          variant={currentPage === 'messaging' ? 'default' : 'ghost'}
-          onClick={() => navigateTo('messaging')}
-          className="gap-2 w-full md:w-auto justify-start"
-        >
-          <ChatCircle size={18} />
-          Messaging
-        </Button>
+        <>
+          <Button
+            variant={currentPage === 'messaging' ? 'default' : 'ghost'}
+            onClick={() => navigateTo('messaging')}
+            className="gap-2 w-full md:w-auto justify-start"
+          >
+            <ChatCircle size={18} />
+            Messaging
+          </Button>
+          <Button
+            variant={currentPage === 'users' ? 'default' : 'ghost'}
+            onClick={() => navigateTo('users')}
+            className="gap-2 w-full md:w-auto justify-start"
+          >
+            <UserGear size={18} />
+            Users
+          </Button>
+        </>
       )}
     </>
   )
@@ -101,6 +127,7 @@ function AppContent() {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
+            <NotificationBell />
             <div className="hidden sm:block text-sm text-right">
               <div className="font-medium truncate max-w-[150px] md:max-w-none">{user?.email}</div>
               <div className="text-xs text-muted-foreground capitalize">{user?.role}</div>
@@ -139,8 +166,14 @@ function AppContent() {
           {currentPage === 'neighbors' && <NeighborManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}
+          {currentPage === 'users' && <UserManager />}
         </div>
       </main>
+
+      <ChangePasswordDialog 
+        open={showPasswordChange} 
+        onClose={() => setShowPasswordChange(false)} 
+      />
     </div>
   )
 }
@@ -148,9 +181,11 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
-      <SyncIndicator />
-      <Toaster />
+      <NotificationProvider>
+        <AppContent />
+        <SyncIndicator />
+        <Toaster />
+      </NotificationProvider>
     </AuthProvider>
   )
 }

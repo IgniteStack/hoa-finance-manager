@@ -1,44 +1,47 @@
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { User, AuthState } from '@/lib/types'
+import { verifyPassword } from '@/lib/password-utils'
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<{ success: boolean; mustChangePassword?: boolean }>
   logout: () => void
+  updatePassword: (newPassword: string) => void
   isAdmin: boolean
+  users: User[]
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useKV<User | null>('auth-user', null)
+  const [users] = useKV<User[]>('system-users', [])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    if (email === 'admin@hoa.com' && password === 'admin123') {
-      setUser(() => ({
-        id: '1',
-        firstName: 'Admin',
-        lastName: 'User',
-        email: 'admin@hoa.com',
-        role: 'admin',
-        phoneNumber: '',
-        createdAt: new Date().toISOString()
-      }))
-      return true
-    } else if (email === 'neighbor@hoa.com' && password === 'neighbor123') {
-      setUser(() => ({
-        id: '2',
-        firstName: 'Neighbor',
-        lastName: 'User',
-        email: 'neighbor@hoa.com',
-        role: 'neighbor',
-        neighborId: 'n1',
-        phoneNumber: '',
-        createdAt: new Date().toISOString()
-      }))
-      return true
+  const login = async (email: string, password: string): Promise<{ success: boolean; mustChangePassword?: boolean }> => {
+    const foundUser = (users || []).find(u => u.email === email)
+    
+    if (!foundUser || !foundUser.password) {
+      return { success: false }
     }
-    return false
+
+    const isValid = verifyPassword(password, foundUser.password)
+    
+    if (isValid) {
+      const userToSet = { ...foundUser }
+      delete userToSet.password
+      setUser(() => userToSet)
+      return { success: true, mustChangePassword: foundUser.mustChangePassword }
+    }
+    
+    return { success: false }
+  }
+
+  const updatePassword = (newPassword: string) => {
+    if (!user) return
+    setUser((currentUser) => {
+      if (!currentUser) return null
+      return { ...currentUser, mustChangePassword: false }
+    })
   }
 
   const logout = () => {
@@ -54,7 +57,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!currentUser,
         login,
         logout,
-        isAdmin: currentUser?.role === 'admin'
+        updatePassword,
+        isAdmin: currentUser?.role === 'admin',
+        users: users || []
       }}
     >
       {children}
