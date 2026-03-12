@@ -18,11 +18,11 @@ export function MessagingPage() {
     setIsGenerating(true)
     
     try {
-      const promptText = `You are a helpful HOA community manager assistant. The admin wants to send the following message to the community: "${message}"
+      const prompt = window.spark.llmPrompt`You are a helpful HOA community manager assistant. The admin wants to send the following message to the community: "${message}"
 
 Please generate a professional, friendly WhatsApp message suitable for sending to the community group. Keep it concise and clear.`
       
-      const generatedMessage = await window.spark.llm(promptText, 'gpt-4o-mini')
+      const generatedMessage = await window.spark.llm(prompt, 'gpt-4o-mini')
       
       toast.success('Message prepared! (Would be sent to WhatsApp group)')
       toast.info(generatedMessage, { duration: 8000 })
@@ -38,11 +38,11 @@ Please generate a professional, friendly WhatsApp message suitable for sending t
     setIsGenerating(true)
     
     try {
-      const promptText = `You are a helpful HOA community manager assistant. Generate a professional WhatsApp message for the following purpose: "${command}"
+      const prompt = window.spark.llmPrompt`You are a helpful HOA community manager assistant. Generate a professional WhatsApp message for the following purpose: "${command}"
 
 The message should be suitable for sending to a residential community group. Be friendly, clear, and concise.`
       
-      const generatedMessage = await window.spark.llm(promptText, 'gpt-4o-mini')
+      const generatedMessage = await window.spark.llm(prompt, 'gpt-4o-mini')
       setMessage(generatedMessage)
       toast.success('Message generated!')
     } catch (error) {

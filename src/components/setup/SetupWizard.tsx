@@ -79,14 +79,14 @@ export function SetupWizard() {
       createdAt: new Date().toISOString()
     }
 
-    setNeighbors([adminNeighbor])
-    setFiscalPeriods([firstPeriod])
+    setNeighbors(() => [adminNeighbor])
+    setFiscalPeriods(() => [firstPeriod])
     
-    setSystemConfig({
+    setSystemConfig(() => ({
       isSetupComplete: true,
       totalHouses: parseInt(totalHouses),
       createdAt: new Date().toISOString()
-    })
+    }))
 
     setAuthUser(() => ({
       id: 'admin-1',
