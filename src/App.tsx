@@ -13,10 +13,12 @@ import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
 import { UserManager } from '@/components/dashboard/UserManager'
 import { NotificationBell } from '@/components/NotificationBell'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
+import { SecurityQuestionDialog } from '@/components/SecurityQuestionDialog'
 import { SyncIndicator } from '@/components/SyncIndicator'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear } from '@phosphor-icons/react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear, User as UserIcon, Key, ShieldCheck } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 
 type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'users'
@@ -27,6 +29,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [showSecurityQuestion, setShowSecurityQuestion] = useState(false)
 
   if (!systemConfig?.isSetupComplete) {
     return <SetupWizard />
@@ -128,13 +131,36 @@ function AppContent() {
 
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
             <NotificationBell />
-            <div className="hidden sm:block text-sm text-right">
-              <div className="font-medium truncate max-w-[150px] md:max-w-none">{user?.email}</div>
-              <div className="text-xs text-muted-foreground capitalize">{user?.role}</div>
-            </div>
-            <Button variant="outline" size="icon" onClick={logout} className="shrink-0">
-              <SignOut size={18} />
-            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="shrink-0">
+                  <UserIcon size={18} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user?.email}</p>
+                    <p className="text-xs leading-none text-muted-foreground capitalize">{user?.role}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowPasswordChange(true)}>
+                  <Key size={16} className="mr-2" />
+                  Change Password
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowSecurityQuestion(true)}>
+                  <ShieldCheck size={16} className="mr-2" />
+                  Security Question
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <SignOut size={16} className="mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -174,6 +200,14 @@ function AppContent() {
         open={showPasswordChange} 
         onClose={() => setShowPasswordChange(false)} 
       />
+      
+      {user && (
+        <SecurityQuestionDialog
+          open={showSecurityQuestion}
+          onClose={() => setShowSecurityQuestion(false)}
+          userId={user.id}
+        />
+      )}
     </div>
   )
 }

@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus, Trash, Key, Copy, Eye, EyeSlash } from '@phosphor-icons/react'
+import { SecurityQuestionDialog } from '@/components/SecurityQuestionDialog'
+import { Plus, Trash, Key, Copy, Eye, EyeSlash, ShieldCheck, ShieldWarning } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { generatePassword, hashPassword } from '@/lib/password-utils'
 
@@ -19,6 +20,8 @@ export function UserManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [generatedPassword, setGeneratedPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [showSecurityDialog, setShowSecurityDialog] = useState(false)
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -66,6 +69,11 @@ export function UserManager() {
     toast.success('New password generated and copied to clipboard', {
       description: `Password: ${newPassword}`
     })
+  }
+
+  const handleSetupSecurity = (userId: string) => {
+    setSelectedUserId(userId)
+    setShowSecurityDialog(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,13 +135,14 @@ export function UserManager() {
                 <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Security</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {(users || []).length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     No users found. Add your first user to get started.
                   </TableCell>
                 </TableRow>
@@ -160,8 +169,30 @@ export function UserManager() {
                         </Badge>
                       )}
                     </TableCell>
+                    <TableCell>
+                      {user.securityQuestion ? (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <ShieldCheck size={14} weight="fill" className="text-accent" />
+                          Set
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <ShieldWarning size={14} weight="fill" className="text-destructive" />
+                          Not set
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSetupSecurity(user.id)}
+                          className="gap-2"
+                        >
+                          <ShieldCheck size={16} />
+                          Security
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -169,7 +200,7 @@ export function UserManager() {
                           className="gap-2"
                         >
                           <Key size={16} />
-                          Reset Password
+                          Reset
                         </Button>
                         <Button
                           variant="outline"
@@ -317,6 +348,17 @@ export function UserManager() {
           )}
         </DialogContent>
       </Dialog>
+
+      {selectedUserId && (
+        <SecurityQuestionDialog
+          open={showSecurityDialog}
+          onClose={() => {
+            setShowSecurityDialog(false)
+            setSelectedUserId(null)
+          }}
+          userId={selectedUserId}
+        />
+      )}
     </div>
   )
 }

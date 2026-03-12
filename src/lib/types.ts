@@ -16,6 +16,8 @@ export interface User {
   neighborId?: string
   password?: string
   mustChangePassword?: boolean
+  securityQuestion?: string
+  securityAnswer?: string
   createdAt: string
 }
 

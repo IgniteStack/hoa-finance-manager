@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
+import { ForgotPasswordDialog } from '@/components/ForgotPasswordDialog'
 import { House, EnvelopeSimple, Copy } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -15,6 +16,7 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPasswordChange, setShowPasswordChange] = useState(false)
   const [showForgotEmail, setShowForgotEmail] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   const { login, users } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +51,11 @@ export function LoginPage() {
       <ChangePasswordDialog 
         open={showPasswordChange} 
         onClose={() => setShowPasswordChange(false)} 
+      />
+      
+      <ForgotPasswordDialog
+        open={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
       />
       
       <Card className="w-full max-w-md">
@@ -92,7 +99,15 @@ export function LoginPage() {
             </Button>
           </form>
           
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-1">
+            <Button 
+              variant="link" 
+              onClick={() => setShowForgotPassword(true)}
+              className="text-sm"
+            >
+              Forgot your password?
+            </Button>
+            <br />
             <Button 
               variant="link" 
               onClick={() => setShowForgotEmail(true)}
