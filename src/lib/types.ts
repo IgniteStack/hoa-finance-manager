@@ -2,72 +2,72 @@ export type UserRole = 'admin' | 'neighbor'
 
 export type OwnershipStatus = 'owner' | 'tenant'
 
-export type RecordStatus = 'draft' | 'active' | 'reversed'
-
-export interface User {
-  id: string
   firstName: string
-  lastName: string
-  email: string
-  role: UserRole
+
   neighborId?: string
-  phoneNumber: string
-  createdAt: string
-}
+  createdAt:
 
-export interface Neighbor {
   id: string
-  houseNumber: string
-  firstName: string
-  lastName: string
+  firstName: st
   email: string
-  phoneNumber: string
-  ownershipStatus: OwnershipStatus
-  isActive: boolean
+  ownershipStatus: Ow
   balance: number
   createdAt: string
-}
+e
 
-export interface Expense {
-  id: string
-  amount: number
-  date: string
   concept: string
-  notes?: string
-  status: RecordStatus
-  postedAt?: string
+  status: Re
   reversedAt?: string
-  fiscalPeriodId?: string
   createdAt: string
-}
 
-export type PeriodType = 'monthly' | 'quarterly' | 'yearly' | 'custom'
 
-export interface FiscalPeriod {
   id: string
-  name: string
   type: PeriodType
-  startDate: string
   endDate: string
-  isClosed: boolean
-  closedAt?: string
-  createdAt: string
+  closedAt?: stri
 }
+e
 
-export interface Payment {
-  id: string
-  amount: number
-  date: string
   concept?: string
-  neighborId: string
-  houseNumber: string
-  bankAccount?: string
-  status: RecordStatus
-  postedAt?: string
-  reversedAt?: string
-  fiscalPeriodId?: string
-  createdAt: string
-}
+  houseNumbe
+  status: Record
+  reversedAt?:
+  createdAt: stri
+
+  totalIncome: number
+  balance: number
+  pendingPayments: nu
+
+  isSetupComplete: 
+ 
+
+export interface AuthState {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export interface DashboardStats {
   totalIncome: number
