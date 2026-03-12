@@ -1,12 +1,8 @@
 export function generatePassword(length: number = 12): string {
   const lowercase = 'abcdefghijklmnopqrstuvwxyz'
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const numbers = '0123456789'
-  const symbols = '!@#$%^&*'
-  
+  const numbers = '0123456789'
   const allChars = uppercase + lowercase + numbers + symbols
-  
-  let password = ''
   password += uppercase[Math.floor(Math.random() * uppercase.length)]
   password += lowercase[Math.floor(Math.random() * lowercase.length)]
   password += numbers[Math.floor(Math.random() * numbers.length)]
