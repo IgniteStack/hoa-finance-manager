@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { User } from '@/lib/types'
-import { hashPassword, verifyPassword } from '@/lib/password-utils'
+import { hashPassword } from '@/lib/password-utils'
 import { toast } from 'sonner'
 import { ArrowLeft, CheckCircle } from '@phosphor-icons/react'
 
@@ -32,110 +32,110 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
     setEmail('')
     setSecurityAnswer('')
     setNewPassword('')
+    setConfirmPassword('')
+    setError('')
     setFoundUser(null)
+    onClose()
   }
-  const handleEmailSub
-    setError(
-   
 
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (!users) {
+      setError('System error. Please try again.')
       return
+    }
 
-      setError('
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase())
+    if (!user) {
+      setError('No account found with this email address.')
+      return
+    }
+
+    if (!user.securityQuestion || !user.securityAnswer) {
+      setError('This account does not have a security question set up. Please contact an administrator.')
+      return
+    }
 
     setFoundUser(user)
+    setStep('security')
   }
-  const handleSe
-    setError('')
-    if (!fou
-     
 
-    
-      setError('Incorrect answer. Please try again.')
-    }
-    s
-
+  const handleSecuritySubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
 
-   
+    if (!foundUser || !foundUser.securityAnswer) {
+      return
+    }
+
+    if (securityAnswer.toLowerCase().trim() !== foundUser.securityAnswer.toLowerCase().trim()) {
+      setError('Incorrect answer. Please try again.')
+      return
+    }
+
+    setStep('password')
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
 
     if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters long.')
       return
-
-
     }
-    const hashedPassword = await hashPassword(newPass
-    setUsers
-     
 
-    )
-    
+    if (!foundUser) {
+      return
+    }
+
+    const hashedPassword = await hashPassword(newPassword)
+    setUsers((currentUsers) => {
+      if (!currentUsers) return []
+      return currentUsers.map(u =>
+        u.id === foundUser.id
+          ? { ...u, password: hashedPassword, mustChangePassword: false }
+          : u
+      )
+    })
+
+    toast.success('Password reset successfully!')
+    setStep('success')
   }
+
   const handleBackToEmail = () => {
-    setSecur
+    setSecurityAnswer('')
+    setError('')
+    setStep('email')
   }
 
+  const handleBackToSecurity = () => {
     setNewPassword('')
-   
+    setConfirmPassword('')
+    setError('')
+    setStep('security')
+  }
 
+  return (
     <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
         <DialogHeader>
-            {ste
-
+          <DialogTitle>
+            {step === 'email' && 'Reset Password'}
+            {step === 'security' && 'Security Verification'}
+            {step === 'password' && 'Set New Password'}
+            {step === 'success' && 'Password Reset Complete'}
           </DialogTitle>
+        </DialogHeader>
 
-          <f
-     
-
-                value={email}
-                placeholder="Enter your email"
-            
-     
-
-                <Aler
-            )}
-            
-     
-
-              </Button>
-    
-
-          <form onSubmit={h
-              <p className="t
-            </div>
-            <
-       
-     
-
-                required
-                autoFo
-   
-
-
-              <Alert
-              </Alert>
-
-   
-
-              <Button type="submit" cl
-              </Button>
-          </form>
-
-          <form 
-   
-
-          
-                required
-                autoFocus
-            </div>
-            <div classN
-              <Input
-                type="password"
-                onChange={(e) => setConfirmPassword(e
-                minLength={8}
-            </div>
-            {error && (
-
-            )}
+        {step === 'email' && (
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
@@ -241,39 +241,6 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={handleBackToSecurity} className="gap-2">
-                <ArrowLeft size={16} />
-                Back
-              </Button>
-              <Button type="submit" className="flex-1">
-                Reset Password
-              </Button>
-            </div>
-          </form>
-        )}
-
-        {step === 'success' && (
-          <div className="space-y-4">
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <div className="bg-accent/20 text-accent p-4 rounded-full mb-4">
-                <CheckCircle size={48} weight="fill" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Your password has been reset successfully. You can now close this dialog and sign in with your new password.
-              </p>
-            </div>
-
-            <Button onClick={handleClose} className="w-full">
-              Close
-            </Button>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
-  )
-}
 
             <div className="flex gap-2">
               <Button type="button" variant="outline" onClick={handleBackToSecurity} className="gap-2">
