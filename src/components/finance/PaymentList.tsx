@@ -94,6 +94,7 @@ export function PaymentList({ neighbors }: PaymentListProps) {
         neighborId: formData.neighborId,
         houseNumber: neighbor.houseNumber,
         bankAccount: formData.bankAccount,
+        status: 'draft',
         createdAt: new Date().toISOString()
       }
       setPayments((current) => [...(current || []), newPayment])

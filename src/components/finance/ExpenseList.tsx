@@ -74,6 +74,7 @@ export function ExpenseList() {
         amount: parseFloat(formData.amount),
         date: formData.date,
         notes: formData.notes,
+        status: 'draft',
         createdAt: new Date().toISOString()
       }
       setExpenses((current) => [...(current || []), newExpense])

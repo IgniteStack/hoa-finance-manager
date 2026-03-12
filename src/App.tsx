@@ -1,19 +1,28 @@
 import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
+import { SystemConfig } from '@/lib/types'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
 import { NeighborManager } from '@/components/neighbors/NeighborManager'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
+import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
 import { Button } from '@/components/ui/button'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House } from '@phosphor-icons/react'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 
-type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging'
+type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
+  const [systemConfig] = useKV<SystemConfig>('system-config', { isSetupComplete: false, totalHouses: 0 })
   const [currentPage, setCurrentPage] = useState<Page>('dashboard')
+
+  if (!systemConfig?.isSetupComplete) {
+    return <SetupWizard />
+  }
 
   if (!isAuthenticated) {
     return <LoginPage />
@@ -39,6 +48,16 @@ function AppContent() {
               <ChartLine size={18} />
               Dashboard
             </Button>
+            {isAdmin && (
+              <Button
+                variant={currentPage === 'periods' ? 'default' : 'ghost'}
+                onClick={() => setCurrentPage('periods')}
+                className="gap-2"
+              >
+                <CalendarBlank size={18} />
+                Periods
+              </Button>
+            )}
             <Button
               variant={currentPage === 'neighbors' ? 'default' : 'ghost'}
               onClick={() => setCurrentPage('neighbors')}
@@ -82,6 +101,7 @@ function AppContent() {
       <main className="p-6">
         <div className="max-w-7xl mx-auto">
           {currentPage === 'dashboard' && <DashboardPage />}
+          {currentPage === 'periods' && <FiscalPeriodManager />}
           {currentPage === 'neighbors' && <NeighborManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}

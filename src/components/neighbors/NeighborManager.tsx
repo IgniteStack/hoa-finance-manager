@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Neighbor, OwnershipStatus, RoleType } from '@/lib/types'
+import { Neighbor, OwnershipStatus, RoleType, SystemConfig } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,10 +16,13 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export function NeighborManager() {
   const [neighbors, setNeighbors] = useKV<Neighbor[]>('neighbors', [])
+  const [systemConfig] = useKV<SystemConfig>('system-config', { isSetupComplete: false, totalHouses: 0 })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingNeighbor, setEditingNeighbor] = useState<Neighbor | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const { isAdmin } = useAuth()
+
+  const houseNumbers = Array.from({ length: systemConfig?.totalHouses || 50 }, (_, i) => (i + 1).toString())
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -152,7 +155,8 @@ export function NeighborManager() {
                   <TableHead>Name</TableHead>
                   <TableHead>House</TableHead>
                   <TableHead>Phone</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>Ownership</TableHead>
+                  <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
                   {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
@@ -166,12 +170,14 @@ export function NeighborManager() {
                     <TableCell className="font-mono">{neighbor.houseNumber}</TableCell>
                     <TableCell className="font-mono text-sm">{neighbor.phoneNumber}</TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
-                          {neighbor.ownershipStatus}
-                        </Badge>
-                        <Badge variant="outline">{neighbor.roleType}</Badge>
-                      </div>
+                      <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
+                        {neighbor.ownershipStatus}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={neighbor.roleType === 'management' ? 'default' : 'outline'}>
+                        {neighbor.roleType}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant={neighbor.active ? 'default' : 'destructive'}>
@@ -250,12 +256,22 @@ export function NeighborManager() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="houseNumber">House Number *</Label>
-                    <Input
-                      id="houseNumber"
+                    <Select
                       value={formData.houseNumber}
-                      onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
+                      onValueChange={(value) => setFormData({ ...formData, houseNumber: value })}
                       required
-                    />
+                    >
+                      <SelectTrigger id="houseNumber">
+                        <SelectValue placeholder="Select house number" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {houseNumbers.map((num) => (
+                          <SelectItem key={num} value={num}>
+                            House {num}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phoneNumber">Phone Number *</Label>

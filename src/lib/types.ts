@@ -4,6 +4,8 @@ export type OwnershipStatus = 'owner' | 'tenant'
 
 export type RoleType = 'neighbor' | 'management'
 
+export type RecordStatus = 'draft' | 'posted' | 'reversed'
+
 export interface User {
   id: string
   email: string
@@ -31,6 +33,10 @@ export interface Expense {
   amount: number
   date: string
   notes?: string
+  status: RecordStatus
+  postedAt?: string
+  reversedAt?: string
+  fiscalPeriodId?: string
   createdAt: string
 }
 
@@ -42,15 +48,30 @@ export interface Payment {
   neighborId: string
   houseNumber: string
   bankAccount?: string
+  status: RecordStatus
+  postedAt?: string
+  reversedAt?: string
+  fiscalPeriodId?: string
   createdAt: string
 }
 
 export type PeriodType = 'monthly' | 'quarterly' | 'yearly' | 'custom'
 
 export interface FiscalPeriod {
+  id: string
+  name: string
   type: PeriodType
   startDate: string
   endDate: string
+  isClosed: boolean
+  closedAt?: string
+  createdAt: string
+}
+
+export interface SystemConfig {
+  isSetupComplete: boolean
+  totalHouses: number
+  setupCompletedAt?: string
 }
 
 export interface DashboardStats {
