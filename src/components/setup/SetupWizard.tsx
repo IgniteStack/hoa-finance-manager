@@ -63,7 +63,6 @@ export function SetupWizard() {
       houseNumber: adminData.houseNumber,
       phoneNumber: adminData.phoneNumber,
       ownershipStatus: 'owner',
-      roleType: 'management',
       active: true,
       createdAt: new Date().toISOString()
     }

@@ -2,15 +2,15 @@ export type UserRole = 'admin' | 'neighbor'
 
 export type OwnershipStatus = 'owner' | 'tenant'
 
-export type RecordStatus = 'active' | 'reversed'
+export type RecordStatus = 'draft' | 'active' | 'reversed'
 
 export interface User {
   firstName: string
   email: string
   role: UserRole
   neighborId?: string
-} role: UserRole
-  neighborId?: string
+}
+
 export interface Neighbor {
   id: string
   firstName: string
@@ -20,9 +20,6 @@ export interface Neighbor {
   houseNumber: string
   phoneNumber: string
   ownershipStatus: OwnershipStatus
-  postedAt?: string
-  active: boolean
-  createdAt: string
   postedAt?: string
   active: boolean
   createdAt: string

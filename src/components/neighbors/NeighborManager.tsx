@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Neighbor, OwnershipStatus, RoleType, SystemConfig } from '@/lib/types'
+import { Neighbor, OwnershipStatus, SystemConfig } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +32,6 @@ export function NeighborManager() {
     houseNumber: '',
     phoneNumber: '',
     ownershipStatus: 'owner' as OwnershipStatus,
-    roleType: 'neighbor' as RoleType,
     active: true
   })
 
@@ -45,7 +44,6 @@ export function NeighborManager() {
       houseNumber: '',
       phoneNumber: '',
       ownershipStatus: 'owner',
-      roleType: 'neighbor',
       active: true
     })
     setEditingNeighbor(null)
@@ -66,7 +64,6 @@ export function NeighborManager() {
       houseNumber: neighbor.houseNumber,
       phoneNumber: neighbor.phoneNumber,
       ownershipStatus: neighbor.ownershipStatus,
-      roleType: neighbor.roleType || '',
       active: neighbor.active
     })
     setIsDialogOpen(true)
@@ -156,7 +153,6 @@ export function NeighborManager() {
                   <TableHead>House</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Ownership</TableHead>
-                  <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
                   {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                 </TableRow>
@@ -172,11 +168,6 @@ export function NeighborManager() {
                     <TableCell>
                       <Badge variant={neighbor.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
                         {neighbor.ownershipStatus}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={neighbor.roleType === 'management' ? 'default' : 'outline'}>
-                        {neighbor.roleType}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -285,37 +276,20 @@ export function NeighborManager() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="ownershipStatus">Ownership Status</Label>
-                    <Select
-                      value={formData.ownershipStatus}
-                      onValueChange={(value: OwnershipStatus) => setFormData({ ...formData, ownershipStatus: value })}
-                    >
-                      <SelectTrigger id="ownershipStatus">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="owner">Owner</SelectItem>
-                        <SelectItem value="tenant">Tenant</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="roleType">Role Type</Label>
-                    <Select
-                      value={formData.roleType}
-                      onValueChange={(value: RoleType) => setFormData({ ...formData, roleType: value })}
-                    >
-                      <SelectTrigger id="roleType">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="neighbor">Neighbor</SelectItem>
-                        <SelectItem value="management">Management</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ownershipStatus">Ownership Status</Label>
+                  <Select
+                    value={formData.ownershipStatus}
+                    onValueChange={(value: OwnershipStatus) => setFormData({ ...formData, ownershipStatus: value })}
+                  >
+                    <SelectTrigger id="ownershipStatus">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="tenant">Tenant</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex items-center space-x-2">
