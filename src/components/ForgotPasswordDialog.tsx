@@ -32,110 +32,110 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
     setEmail('')
     setSecurityAnswer('')
     setNewPassword('')
-    setConfirmPassword('')
-    setError('')
     setFoundUser(null)
-    onClose()
   }
+  const handleEmailSub
+    setError(
+   
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
-    const user = (users || []).find(u => u.email.toLowerCase() === email.toLowerCase())
-    
-    if (!user) {
-      setError('No account found with this email address')
       return
-    }
 
-    if (!user.securityQuestion || !user.securityAnswer) {
-      setError('This account does not have a security question set up. Please contact an administrator.')
-      return
-    }
+      setError('
 
     setFoundUser(user)
-    setStep('security')
   }
-
-  const handleSecuritySubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSe
     setError('')
+    if (!fou
+     
 
-    if (!foundUser || !foundUser.securityAnswer) {
-      setError('Invalid session. Please start over.')
-      return
-    }
-
-    const isValid = await verifyPassword(securityAnswer, foundUser.securityAnswer)
     
-    if (!isValid) {
       setError('Incorrect answer. Please try again.')
-      return
     }
+    s
 
-    setStep('password')
-  }
-
-  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
 
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+   
 
     if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters')
       return
-    }
 
-    if (!foundUser) {
-      setError('Invalid session. Please start over.')
-      return
-    }
 
-    const hashedPassword = await hashPassword(newPassword)
-    
-    setUsers((currentUsers) =>
-      (currentUsers || []).map(u =>
-        u.id === foundUser.id
-          ? { ...u, password: hashedPassword, mustChangePassword: false }
-          : u
-      )
+    }
+    const hashedPassword = await hashPassword(newPass
+    setUsers
+     
+
     )
-
-    toast.success('Password reset successfully')
-    setStep('success')
+    
   }
-
   const handleBackToEmail = () => {
-    setStep('email')
-    setSecurityAnswer('')
-    setError('')
+    setSecur
   }
 
-  const handleBackToSecurity = () => {
-    setStep('security')
     setNewPassword('')
-    setConfirmPassword('')
-    setError('')
-  }
+   
 
-  return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {step === 'email' && 'Forgot Password'}
-            {step === 'security' && 'Security Question'}
-            {step === 'password' && 'Reset Password'}
-            {step === 'success' && 'Password Reset'}
-          </DialogTitle>
-        </DialogHeader>
+            {ste
 
-        {step === 'email' && (
+          </DialogTitle>
+
+          <f
+     
+
+                value={email}
+                placeholder="Enter your email"
+            
+     
+
+                <Aler
+            )}
+            
+     
+
+              </Button>
+    
+
+          <form onSubmit={h
+              <p className="t
+            </div>
+            <
+       
+     
+
+                required
+                autoFo
+   
+
+
+              <Alert
+              </Alert>
+
+   
+
+              <Button type="submit" cl
+              </Button>
+          </form>
+
+          <form 
+   
+
+          
+                required
+                autoFocus
+            </div>
+            <div classN
+              <Input
+                type="password"
+                onChange={(e) => setConfirmPassword(e
+                minLength={8}
+            </div>
+            {error && (
+
+            )}
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
@@ -241,6 +241,39 @@ export function ForgotPasswordDialog({ open, onClose }: ForgotPasswordDialogProp
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleBackToSecurity} className="gap-2">
+                <ArrowLeft size={16} />
+                Back
+              </Button>
+              <Button type="submit" className="flex-1">
+                Reset Password
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {step === 'success' && (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="bg-accent/20 text-accent p-4 rounded-full mb-4">
+                <CheckCircle size={48} weight="fill" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Your password has been reset successfully. You can now close this dialog and sign in with your new password.
+              </p>
+            </div>
+
+            <Button onClick={handleClose} className="w-full">
+              Close
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
 
             <div className="flex gap-2">
               <Button type="button" variant="outline" onClick={handleBackToSecurity} className="gap-2">
