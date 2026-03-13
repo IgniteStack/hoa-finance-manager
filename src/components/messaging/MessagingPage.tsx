@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Neighbor } from '@/lib/types'
+import { User } from '@/lib/types'
 import { useNotifications } from '@/contexts/NotificationContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,7 +22,7 @@ interface Message {
 }
 
 export function MessagingPage() {
-  const [neighbors] = useKV<Neighbor[]>('neighbors', [])
+  const [members] = useKV<User[]>('system-users', [])
   const [messages, setMessages] = useKV<Message[]>('messages', [])
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
@@ -31,13 +31,13 @@ export function MessagingPage() {
   const { addNotification } = useNotifications()
   const { users } = useAuth()
 
-  const activeNeighbors = (neighbors || []).filter(n => n.isActive)
+  const activeMembers = (members || []).filter(m => m.isActive)
 
-  const handleRecipientToggle = (neighborId: string) => {
+  const handleRecipientToggle = (memberId: string) => {
     setSelectedRecipients(prev =>
-      prev.includes(neighborId)
-        ? prev.filter(id => id !== neighborId)
-        : [...prev, neighborId]
+      prev.includes(memberId)
+        ? prev.filter(id => id !== memberId)
+        : [...prev, memberId]
     )
   }
 
@@ -48,7 +48,7 @@ export function MessagingPage() {
     }
 
     const recipients = recipientMode === 'all'
-      ? activeNeighbors.map(n => n.id)
+      ? activeMembers.map(m => m.id)
       : selectedRecipients
 
     if (recipients.length === 0) {
@@ -69,13 +69,13 @@ export function MessagingPage() {
 
     setMessages(prev => [newMessage, ...(prev || [])])
 
-    recipients.forEach(neighborId => {
-      const neighbor = activeNeighbors.find(n => n.id === neighborId)
-      if (neighbor) {
-        const neighborUser = (users || []).find(u => u.email === neighbor.email)
-        if (neighborUser) {
+    recipients.forEach(memberId => {
+      const member = activeMembers.find(m => m.id === memberId)
+      if (member) {
+        const memberUser = (users || []).find(u => u.email === member.email)
+        if (memberUser) {
           addNotification({
-            userId: neighborUser.id,
+            userId: memberUser.id,
             type: 'message',
             title: subject,
             body: body.substring(0, 100) + (body.length > 100 ? '...' : ''),
@@ -139,26 +139,26 @@ export function MessagingPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Active Neighbors</SelectItem>
-                    <SelectItem value="selective">Select Specific Neighbors</SelectItem>
+                    <SelectItem value="all">All Active Members</SelectItem>
+                    <SelectItem value="selective">Select Specific Members</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {recipientMode === 'selective' && (
                 <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-4">
-                  {activeNeighbors.map(neighbor => (
-                    <div key={neighbor.id} className="flex items-center gap-2">
+                  {activeMembers.map(member => (
+                    <div key={member.id} className="flex items-center gap-2">
                       <Checkbox
-                        id={`neighbor-${neighbor.id}`}
-                        checked={selectedRecipients.includes(neighbor.id)}
-                        onCheckedChange={() => handleRecipientToggle(neighbor.id)}
+                        id={`member-${member.id}`}
+                        checked={selectedRecipients.includes(member.id)}
+                        onCheckedChange={() => handleRecipientToggle(member.id)}
                       />
                       <label
-                        htmlFor={`neighbor-${neighbor.id}`}
+                        htmlFor={`member-${member.id}`}
                         className="text-sm flex-1 cursor-pointer"
                       >
-                        {neighbor.firstName} {neighbor.lastName} - House #{neighbor.houseNumber}
+                        {member.firstName} {member.lastName} - House #{member.houseNumber}
                       </label>
                     </div>
                   ))}
@@ -182,8 +182,8 @@ export function MessagingPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{activeNeighbors.length}</div>
-              <p className="text-sm text-muted-foreground">Active neighbors</p>
+              <div className="text-2xl font-bold">{activeMembers.length}</div>
+              <p className="text-sm text-muted-foreground">Active members</p>
             </CardContent>
           </Card>
 

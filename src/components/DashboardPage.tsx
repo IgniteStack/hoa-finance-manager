@@ -1,10 +1,10 @@
 import { useKV } from '@github/spark/hooks'
-import { Neighbor, Expense, Payment } from '@/lib/types'
+import { User, Expense, Payment } from '@/lib/types'
 import { StatsCards } from '@/components/dashboard/StatsCards'
 import { FinancialCharts } from '@/components/dashboard/FinancialCharts'
 
 export function DashboardPage() {
-  const [neighbors] = useKV<Neighbor[]>('neighbors', [])
+  const [members] = useKV<User[]>('system-users', [])
   const [expenses] = useKV<Expense[]>('expenses', [])
   const [payments] = useKV<Payment[]>('payments', [])
 
@@ -16,7 +16,7 @@ export function DashboardPage() {
       </div>
 
       <StatsCards 
-        neighbors={neighbors || []} 
+        members={members || []} 
         expenses={expenses || []} 
         payments={payments || []} 
       />

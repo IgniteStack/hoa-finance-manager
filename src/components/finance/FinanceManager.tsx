@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Expense, Payment, Neighbor } from '@/lib/types'
+import { Expense, Payment, User } from '@/lib/types'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -10,7 +10,7 @@ import { PaymentList } from './PaymentList'
 export function FinanceManager() {
   const [expenses] = useKV<Expense[]>('expenses', [])
   const [payments] = useKV<Payment[]>('payments', [])
-  const [neighbors] = useKV<Neighbor[]>('neighbors', [])
+  const [members] = useKV<User[]>('system-users', [])
   const { isAdmin } = useAuth()
 
   return (
@@ -26,7 +26,7 @@ export function FinanceManager() {
         </TabsContent>
         
         <TabsContent value="payments">
-          <PaymentList neighbors={neighbors || []} />
+          <PaymentList members={members || []} />
         </TabsContent>
       </Tabs>
     </Card>

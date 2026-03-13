@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { SystemConfig, Neighbor, FiscalPeriod } from '@/lib/types'
+import { SystemConfig, User, FiscalPeriod } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,10 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowRight, ArrowLeft, CheckCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import { hashPassword } from '@/lib/password-utils'
 
 export function SetupWizard() {
   const [, setSystemConfig] = useKV<SystemConfig>('system-config', { isSetupComplete: false, totalHouses: 0 })
-  const [, setNeighbors] = useKV<Neighbor[]>('neighbors', [])
+  const [, setMembers] = useKV<User[]>('system-users', [])
   const [, setFiscalPeriods] = useKV<FiscalPeriod[]>('fiscal-periods', [])
   const [, setAuthUser] = useKV<any>('auth-user', undefined)
 
@@ -50,22 +51,27 @@ export function SetupWizard() {
     setStep(2)
   }
 
-  const handlePeriodSubmit = () => {
+  const handlePeriodSubmit = async () => {
     if (!periodData.name || !periodData.startDate || !periodData.endDate) {
       toast.error('Please fill all period fields')
       return
     }
 
-    const adminNeighbor: Neighbor = {
+    const hashedPassword = await hashPassword(adminData.password)
+
+    const adminUser: User = {
       id: 'admin-1',
       firstName: adminData.firstName,
       lastName: adminData.lastName,
       email: adminData.email,
       houseNumber: parseInt(adminData.houseNumber),
       phoneNumber: adminData.phoneNumber,
+      role: 'admin',
       ownershipStatus: 'owner',
       isActive: true,
       balance: 0,
+      password: hashedPassword,
+      mustChangePassword: false,
       createdAt: new Date().toISOString()
     }
 
@@ -79,7 +85,7 @@ export function SetupWizard() {
       createdAt: new Date().toISOString()
     }
 
-    setNeighbors(() => [adminNeighbor])
+    setMembers(() => [adminUser])
     setFiscalPeriods(() => [firstPeriod])
     
     setSystemConfig(() => ({

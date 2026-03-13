@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Payment, Neighbor } from '@/lib/types'
+import { Payment, User } from '@/lib/types'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,10 +13,10 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 
 interface PaymentListProps {
-  neighbors: Neighbor[]
+  members: User[]
 }
 
-export function PaymentList({ neighbors }: PaymentListProps) {
+export function PaymentList({ members }: PaymentListProps) {
   const [payments, setPayments] = useKV<Payment[]>('payments', [])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
@@ -66,8 +66,8 @@ export function PaymentList({ neighbors }: PaymentListProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const neighbor = neighbors.find(n => n.id === formData.neighborId)
-    if (!neighbor) return
+    const member = members.find(m => m.id === formData.neighborId)
+    if (!member) return
 
     if (editingPayment) {
       setPayments((current) => 
@@ -78,7 +78,7 @@ export function PaymentList({ neighbors }: PaymentListProps) {
               amount: parseFloat(formData.amount),
               date: formData.date,
               neighborId: formData.neighborId,
-              houseNumber: neighbor.houseNumber,
+              houseNumber: member.houseNumber,
               bankAccount: formData.bankAccount
             }
           : pay
@@ -92,7 +92,7 @@ export function PaymentList({ neighbors }: PaymentListProps) {
         amount: parseFloat(formData.amount),
         date: formData.date,
         neighborId: formData.neighborId,
-        houseNumber: neighbor.houseNumber,
+        houseNumber: member.houseNumber,
         bankAccount: formData.bankAccount,
         status: 'draft',
         createdAt: new Date().toISOString()
@@ -140,14 +140,14 @@ export function PaymentList({ neighbors }: PaymentListProps) {
             </TableHeader>
             <TableBody>
               {sortedPayments.map((payment) => {
-                const neighbor = neighbors.find(n => n.id === payment.neighborId)
+                const member = members.find(m => m.id === payment.neighborId)
                 return (
                   <TableRow key={payment.id}>
                     <TableCell className="font-mono text-sm">
                       {format(new Date(payment.date), 'MMM dd, yyyy')}
                     </TableCell>
                     <TableCell className="font-medium">
-                      {neighbor ? `${neighbor.firstName} ${neighbor.lastName}` : 'Unknown'}
+                      {member ? `${member.firstName} ${member.lastName}` : 'Unknown'}
                     </TableCell>
                     <TableCell className="font-mono">{payment.houseNumber}</TableCell>
                     <TableCell>{payment.concept}</TableCell>
@@ -192,12 +192,12 @@ export function PaymentList({ neighbors }: PaymentListProps) {
                   required
                 >
                   <SelectTrigger id="neighbor">
-                    <SelectValue placeholder="Select neighbor" />
+                    <SelectValue placeholder="Select member" />
                   </SelectTrigger>
                   <SelectContent>
-                    {neighbors.map((neighbor) => (
-                      <SelectItem key={neighbor.id} value={neighbor.id}>
-                        {neighbor.firstName} {neighbor.lastName} - House {neighbor.houseNumber}
+                    {members.map((member) => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {member.firstName} {member.lastName} - House {member.houseNumber}
                       </SelectItem>
                     ))}
                   </SelectContent>

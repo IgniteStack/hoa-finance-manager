@@ -1,17 +1,17 @@
 import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CurrencyDollar, Receipt, Users, TrendUp } from '@phosphor-icons/react'
-import { Neighbor, Expense, Payment } from '@/lib/types'
+import { User, Expense, Payment } from '@/lib/types'
 
 interface StatsCardsProps {
-  neighbors: Neighbor[]
+  members: User[]
   expenses: Expense[]
   payments: Payment[]
   startDate?: string
   endDate?: string
 }
 
-export function StatsCards({ neighbors, expenses, payments, startDate, endDate }: StatsCardsProps) {
+export function StatsCards({ members, expenses, payments, startDate, endDate }: StatsCardsProps) {
   const stats = useMemo(() => {
     const filterByDate = <T extends { date: string }>(items: T[]): T[] => {
       if (!startDate && !endDate) return items
@@ -29,10 +29,10 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
     const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0)
     const totalIncome = filteredPayments.reduce((sum, pay) => sum + pay.amount, 0)
     const balance = totalIncome - totalExpenses
-    const activeNeighbors = neighbors.filter(n => n.isActive).length
+    const activeMembers = members.filter(m => m.isActive).length
 
-    return { totalExpenses, totalIncome, balance, activeNeighbors }
-  }, [neighbors, expenses, payments, startDate, endDate])
+    return { totalExpenses, totalIncome, balance, activeMembers }
+  }, [members, expenses, payments, startDate, endDate])
 
   return (
     <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -83,15 +83,15 @@ export function StatsCards({ neighbors, expenses, payments, startDate, endDate }
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Neighbors</CardTitle>
+          <CardTitle className="text-sm font-medium">Active Members</CardTitle>
           <Users className="text-primary" size={20} weight="fill" />
         </CardHeader>
         <CardContent>
           <div className="text-xl md:text-2xl font-mono font-bold text-foreground">
-            {stats.activeNeighbors}
+            {stats.activeMembers}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Of {neighbors.length} total
+            Of {members.length} total
           </p>
         </CardContent>
       </Card>

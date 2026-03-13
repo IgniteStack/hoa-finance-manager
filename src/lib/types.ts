@@ -12,25 +12,15 @@ export interface User {
   lastName: string
   email: string
   role: UserRole
-  phoneNumber?: string
-  neighborId?: string
-  password?: string
-  mustChangePassword?: boolean
-  securityQuestion?: string
-  securityAnswer?: string
-  createdAt: string
-}
-
-export interface Neighbor {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
   houseNumber: number
   phoneNumber?: string
   ownershipStatus: OwnershipStatus
   isActive: boolean
   balance: number
+  password?: string
+  mustChangePassword?: boolean
+  securityQuestion?: string
+  securityAnswer?: string
   createdAt: string
 }
 

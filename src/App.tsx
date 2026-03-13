@@ -6,11 +6,10 @@ import { NotificationProvider } from '@/contexts/NotificationContext'
 import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
-import { NeighborManager } from '@/components/neighbors/NeighborManager'
+import { MemberManager } from '@/components/members/MemberManager'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
 import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
-import { UserManager } from '@/components/dashboard/UserManager'
 import { NotificationBell } from '@/components/NotificationBell'
 import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
 import { SecurityQuestionDialog } from '@/components/SecurityQuestionDialog'
@@ -19,11 +18,11 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, UserGear, User as UserIcon, Key, ShieldCheck, ArrowCounterClockwise } from '@phosphor-icons/react'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, User as UserIcon, Key, ShieldCheck, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 
-type Page = 'dashboard' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'users'
+type Page = 'dashboard' | 'members' | 'finance' | 'messaging' | 'periods'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
@@ -90,12 +89,12 @@ function AppContent() {
         </Button>
       )}
       <Button
-        variant={currentPage === 'neighbors' ? 'default' : 'ghost'}
-        onClick={() => navigateTo('neighbors')}
+        variant={currentPage === 'members' ? 'default' : 'ghost'}
+        onClick={() => navigateTo('members')}
         className="gap-2 w-full md:w-auto justify-start"
       >
         <Users size={18} />
-        Neighbors
+        Members
       </Button>
       <Button
         variant={currentPage === 'finance' ? 'default' : 'ghost'}
@@ -106,24 +105,14 @@ function AppContent() {
         Finance
       </Button>
       {isAdmin && (
-        <>
-          <Button
-            variant={currentPage === 'messaging' ? 'default' : 'ghost'}
-            onClick={() => navigateTo('messaging')}
-            className="gap-2 w-full md:w-auto justify-start"
-          >
-            <ChatCircle size={18} />
-            Messaging
-          </Button>
-          <Button
-            variant={currentPage === 'users' ? 'default' : 'ghost'}
-            onClick={() => navigateTo('users')}
-            className="gap-2 w-full md:w-auto justify-start"
-          >
-            <UserGear size={18} />
-            Users
-          </Button>
-        </>
+        <Button
+          variant={currentPage === 'messaging' ? 'default' : 'ghost'}
+          onClick={() => navigateTo('messaging')}
+          className="gap-2 w-full md:w-auto justify-start"
+        >
+          <ChatCircle size={18} />
+          Messaging
+        </Button>
       )}
     </>
   )
@@ -215,10 +204,9 @@ function AppContent() {
         <div className="max-w-7xl mx-auto">
           {currentPage === 'dashboard' && <DashboardPage />}
           {currentPage === 'periods' && <FiscalPeriodManager />}
-          {currentPage === 'neighbors' && <NeighborManager />}
+          {currentPage === 'members' && <MemberManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}
-          {currentPage === 'users' && <UserManager />}
         </div>
       </main>
 
