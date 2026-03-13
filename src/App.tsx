@@ -6,7 +6,6 @@ import { NotificationProvider } from '@/contexts/NotificationContext'
 import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
-import { MemberManager } from '@/components/members/MemberManager'
 import { NeighborManager } from '@/components/neighbors/NeighborManager'
 import { MemberProfile } from '@/components/members/MemberProfile'
 import { FinanceManager } from '@/components/finance/FinanceManager'
@@ -24,7 +23,7 @@ import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarB
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 
-type Page = 'dashboard' | 'members' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'profile'
+type Page = 'dashboard' | 'users' | 'finance' | 'messaging' | 'periods' | 'profile'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
@@ -91,20 +90,12 @@ function AppContent() {
         </Button>
       )}
       <Button
-        variant={currentPage === 'neighbors' ? 'default' : 'ghost'}
-        onClick={() => navigateTo('neighbors')}
+        variant={currentPage === 'users' ? 'default' : 'ghost'}
+        onClick={() => navigateTo('users')}
         className="gap-2 w-full md:w-auto justify-start"
       >
         <Users size={18} />
-        Neighbors
-      </Button>
-      <Button
-        variant={currentPage === 'members' ? 'default' : 'ghost'}
-        onClick={() => navigateTo('members')}
-        className="gap-2 w-full md:w-auto justify-start"
-      >
-        <Users size={18} />
-        Members
+        Users
       </Button>
       <Button
         variant={currentPage === 'finance' ? 'default' : 'ghost'}
@@ -218,8 +209,7 @@ function AppContent() {
         <div className="max-w-7xl mx-auto">
           {currentPage === 'dashboard' && <DashboardPage />}
           {currentPage === 'periods' && <FiscalPeriodManager />}
-          {currentPage === 'neighbors' && <NeighborManager />}
-          {currentPage === 'members' && <MemberManager />}
+          {currentPage === 'users' && <NeighborManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}
           {currentPage === 'profile' && user && (

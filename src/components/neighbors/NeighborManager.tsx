@@ -98,8 +98,8 @@ export function NeighborManager() {
 
   const handleDeleteClick = (neighbor: User) => {
     if (hasPayments(neighbor.id)) {
-      toast.error('Cannot delete neighbor', {
-        description: 'This neighbor has registered payments and cannot be deleted.'
+      toast.error('Cannot delete user', {
+        description: 'This user has registered payments and cannot be deleted.'
       })
       return
     }
@@ -110,7 +110,7 @@ export function NeighborManager() {
   const handleDeleteConfirm = () => {
     if (neighborToDelete) {
       setNeighbors((current) => (current || []).filter(n => n.id !== neighborToDelete.id))
-      toast.success('Neighbor deleted successfully')
+      toast.success('User deleted successfully')
       setNeighborToDelete(null)
       setDeleteConfirmOpen(false)
     }
@@ -142,7 +142,7 @@ export function NeighborManager() {
           : n
       )
     )
-    toast.success(`Neighbor ${neighbor.isActive ? 'deactivated' : 'activated'} successfully`)
+    toast.success(`User ${neighbor.isActive ? 'deactivated' : 'activated'} successfully`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -176,7 +176,7 @@ export function NeighborManager() {
           : n
         )
       )
-      toast.success('Neighbor updated successfully')
+      toast.success('User updated successfully')
       setIsDialogOpen(false)
       resetForm()
     } else {
@@ -215,7 +215,7 @@ export function NeighborManager() {
       setGeneratedPassword(password)
       setShowPassword(true)
       
-      toast.success('Neighbor created successfully')
+      toast.success('User created successfully')
     }
   }
 
@@ -243,13 +243,13 @@ export function NeighborManager() {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <CardTitle>Neighbors</CardTitle>
-            <CardDescription>Manage community neighbors, accounts, and access</CardDescription>
+            <CardTitle>Users</CardTitle>
+            <CardDescription>Manage community users, accounts, and access</CardDescription>
           </div>
           {isAdmin && (
             <Button onClick={handleAdd} className="w-full sm:w-auto">
               <Plus className="mr-2" size={18} />
-              Add Neighbor
+              Add User
             </Button>
           )}
         </div>
@@ -269,11 +269,11 @@ export function NeighborManager() {
 
         {filteredNeighbors.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p>No neighbors found</p>
+            <p>No users found</p>
             {isAdmin && (
               <Button variant="outline" onClick={handleAdd} className="mt-4">
                 <Plus className="mr-2" size={18} />
-                Add First Neighbor
+                Add First User
               </Button>
             )}
           </div>
@@ -427,16 +427,16 @@ export function NeighborManager() {
         <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingNeighbor ? 'Edit Neighbor' : 'Add Neighbor'}</DialogTitle>
+              <DialogTitle>{editingNeighbor ? 'Edit User' : 'Add User'}</DialogTitle>
               <DialogDescription>
-                {editingNeighbor ? 'Update neighbor information' : 'Add a new neighbor to the community'}
+                {editingNeighbor ? 'Update user information' : 'Add a new user to the community'}
               </DialogDescription>
             </DialogHeader>
             
             {restrictedEdit && (
               <Alert className="bg-accent/10 border-accent">
                 <AlertDescription className="text-sm">
-                  This neighbor has registered payments. Only Phone Numbers, Ownership Status, and Active Status can be edited.
+                  This user has registered payments. Only Phone Numbers, Ownership Status, and Active Status can be edited.
                 </AlertDescription>
               </Alert>
             )}
@@ -596,7 +596,7 @@ export function NeighborManager() {
                     Cancel
                   </Button>
                   <Button type="submit" className="w-full sm:w-auto">
-                    {editingNeighbor ? 'Update' : 'Add'} Neighbor
+                    {editingNeighbor ? 'Update' : 'Add'} User
                   </Button>
                 </DialogFooter>
               </form>
@@ -605,9 +605,9 @@ export function NeighborManager() {
                 <Alert className="bg-accent/10 border-accent">
                   <AlertDescription>
                     <div className="space-y-3">
-                      <p className="font-medium">Neighbor created successfully!</p>
+                      <p className="font-medium">User created successfully!</p>
                       <p className="text-sm">
-                        The neighbor will be required to change this password on first login.
+                        The user will be required to change this password on first login.
                       </p>
                       <div className="bg-background border rounded-md p-3 space-y-2">
                         <div className="flex items-center justify-between">
@@ -639,7 +639,7 @@ export function NeighborManager() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Make sure to copy this password and send it to the neighbor securely.
+                        Make sure to copy this password and send it to the user securely.
                         You won't be able to see it again.
                       </p>
                     </div>
@@ -659,9 +659,9 @@ export function NeighborManager() {
         <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Neighbor?</AlertDialogTitle>
+              <AlertDialogTitle>Delete User?</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this neighbor? This action cannot be undone.
+                Are you sure you want to delete this user? This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
