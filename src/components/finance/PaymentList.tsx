@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
-import { Payment, Neighbor } from '@/lib/types'
+import { Payment, Neighbor, FiscalPeriod } from '@/lib/types'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Plus, PencilSimple, Trash } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, CheckCircle, ArrowCounterClockwise } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 
@@ -18,6 +19,7 @@ interface PaymentListProps {
 
 export function PaymentList({ neighbors }: PaymentListProps) {
   const [payments, setPayments] = useKV<Payment[]>('payments', [])
+  const [fiscalPeriods] = useKV<FiscalPeriod[]>('fiscal-periods', [])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
   const { isAdmin } = useAuth()
@@ -47,6 +49,10 @@ export function PaymentList({ neighbors }: PaymentListProps) {
   }
 
   const handleEdit = (payment: Payment) => {
+    if (payment.status === 'active') {
+      toast.error('Posted payments cannot be edited. Unpost the payment first.')
+      return
+    }
     setEditingPayment(payment)
     setFormData({
       concept: payment.concept || '',
@@ -59,8 +65,42 @@ export function PaymentList({ neighbors }: PaymentListProps) {
   }
 
   const handleDelete = (id: string) => {
+    const payment = (payments || []).find(p => p.id === id)
+    if (payment?.status === 'active') {
+      toast.error('Posted payments cannot be deleted. Unpost the payment first.')
+      return
+    }
     setPayments((current) => (current || []).filter(p => p.id !== id))
     toast.success('Payment deleted')
+  }
+
+  const handlePost = (payment: Payment) => {
+    setPayments((current) =>
+      (current || []).map(p =>
+        p.id === payment.id
+          ? { ...p, status: 'active', postedAt: new Date().toISOString() }
+          : p
+      )
+    )
+    toast.success('Payment posted')
+  }
+
+  const handleUnpost = (payment: Payment) => {
+    if (payment.fiscalPeriodId) {
+      const period = (fiscalPeriods || []).find(fp => fp.id === payment.fiscalPeriodId)
+      if (period?.isClosed) {
+        toast.error('Cannot unpost: the fiscal period is closed.')
+        return
+      }
+    }
+    setPayments((current) =>
+      (current || []).map(p =>
+        p.id === payment.id
+          ? { ...p, status: 'draft', postedAt: undefined }
+          : p
+      )
+    )
+    toast.success('Payment unposted')
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -135,12 +175,14 @@ export function PaymentList({ neighbors }: PaymentListProps) {
                 <TableHead>House</TableHead>
                 <TableHead>Concept</TableHead>
                 <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
                 {isAdmin && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedPayments.map((payment) => {
                 const neighbor = neighbors.find(n => n.id === payment.neighborId)
+                const isPosted = payment.status === 'active'
                 return (
                   <TableRow key={payment.id}>
                     <TableCell className="font-mono text-sm">
@@ -154,13 +196,56 @@ export function PaymentList({ neighbors }: PaymentListProps) {
                     <TableCell className="font-mono font-bold text-accent">
                       ${payment.amount.toFixed(2)}
                     </TableCell>
+                    <TableCell>
+                      {payment.status === 'active' && (
+                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Posted</Badge>
+                      )}
+                      {payment.status === 'draft' && (
+                        <Badge variant="outline" className="text-muted-foreground">Draft</Badge>
+                      )}
+                      {payment.status === 'reversed' && (
+                        <Badge variant="destructive">Reversed</Badge>
+                      )}
+                    </TableCell>
                     {isAdmin && (
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(payment)}>
+                          {!isPosted && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Post payment"
+                              onClick={() => handlePost(payment)}
+                            >
+                              <CheckCircle size={18} />
+                            </Button>
+                          )}
+                          {isPosted && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Unpost payment"
+                              onClick={() => handleUnpost(payment)}
+                            >
+                              <ArrowCounterClockwise size={18} />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title={isPosted ? 'Posted payments cannot be edited' : 'Edit payment'}
+                            disabled={isPosted}
+                            onClick={() => handleEdit(payment)}
+                          >
                             <PencilSimple size={18} />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(payment.id)}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title={isPosted ? 'Posted payments cannot be deleted' : 'Delete payment'}
+                            disabled={isPosted}
+                            onClick={() => handleDelete(payment.id)}
+                          >
                             <Trash size={18} />
                           </Button>
                         </div>
