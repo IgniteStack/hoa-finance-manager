@@ -1,18 +1,5 @@
 @import 'tailwindcss';
-
 @import './index.css';
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
 
-@config '../tailwind.config.js';
-
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
