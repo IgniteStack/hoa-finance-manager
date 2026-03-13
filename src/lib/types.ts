@@ -93,3 +93,16 @@ export interface Notification {
   relatedId?: string
   createdAt: string
 }
+
+export interface MemberDocument {
+  id: string
+  memberId: string
+  fileName: string
+  fileType: string
+  fileSize: number
+  category: 'contract' | 'receipt' | 'identification' | 'other'
+  description?: string
+  uploadedBy: string
+  uploadedAt: string
+  fileData: string
+}

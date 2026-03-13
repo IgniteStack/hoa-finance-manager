@@ -12,7 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { SecurityQuestionDialog } from '@/components/SecurityQuestionDialog'
-import { Plus, PencilSimple, Trash, MagnifyingGlass, Key, Copy, Eye, EyeSlash, ShieldCheck, ShieldWarning } from '@phosphor-icons/react'
+import { MemberProfile } from '@/components/members/MemberProfile'
+import { Plus, PencilSimple, Trash, MagnifyingGlass, Key, Copy, Eye, EyeSlash, ShieldCheck, ShieldWarning, UserCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/contexts/AuthContext'
 import { generatePassword, hashPassword } from '@/lib/password-utils'
@@ -27,6 +28,7 @@ export function MemberManager() {
   const [showPassword, setShowPassword] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [showSecurityDialog, setShowSecurityDialog] = useState(false)
+  const [viewingMemberId, setViewingMemberId] = useState<string | null>(null)
   const { isAdmin } = useAuth()
 
   const houseNumbers = Array.from({ length: systemConfig?.totalHouses || 50 }, (_, i) => (i + 1).toString())
@@ -165,6 +167,15 @@ export function MemberManager() {
     m.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  if (viewingMemberId) {
+    return (
+      <MemberProfile 
+        memberId={viewingMemberId} 
+        onBack={() => setViewingMemberId(null)} 
+      />
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -261,6 +272,9 @@ export function MemberManager() {
                       {isAdmin && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => setViewingMemberId(member.id)}>
+                              <UserCircle size={18} />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleEdit(member)}>
                               <PencilSimple size={18} />
                             </Button>
@@ -328,6 +342,10 @@ export function MemberManager() {
                     </div>
                     {isAdmin && (
                       <div className="grid grid-cols-2 gap-2">
+                        <Button variant="outline" size="sm" onClick={() => setViewingMemberId(member.id)} className="col-span-2">
+                          <UserCircle size={16} className="mr-1" />
+                          View Profile
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => handleEdit(member)}>
                           <PencilSimple size={16} className="mr-1" />
                           Edit

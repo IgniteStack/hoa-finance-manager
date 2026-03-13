@@ -7,6 +7,7 @@ import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
 import { MemberManager } from '@/components/members/MemberManager'
+import { MemberProfile } from '@/components/members/MemberProfile'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
 import { FiscalPeriodManager } from '@/components/dashboard/FiscalPeriodManager'
@@ -18,11 +19,11 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, User as UserIcon, Key, ShieldCheck, ArrowCounterClockwise } from '@phosphor-icons/react'
+import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarBlank, List, User as UserIcon, Key, ShieldCheck, ArrowCounterClockwise, UserCircle } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 
-type Page = 'dashboard' | 'members' | 'finance' | 'messaging' | 'periods'
+type Page = 'dashboard' | 'members' | 'finance' | 'messaging' | 'periods' | 'profile'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
@@ -149,6 +150,10 @@ function AppContent() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigateTo('profile')}>
+                  <UserCircle size={16} className="mr-2" />
+                  My Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowPasswordChange(true)}>
                   <Key size={16} className="mr-2" />
                   Change Password
@@ -207,6 +212,12 @@ function AppContent() {
           {currentPage === 'members' && <MemberManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}
+          {currentPage === 'profile' && user && (
+            <MemberProfile 
+              memberId={user.id} 
+              onBack={() => setCurrentPage('dashboard')} 
+            />
+          )}
         </div>
       </main>
 

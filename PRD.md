@@ -41,6 +41,13 @@ This is a multi-module financial management system with role-based access contro
 - **Progression**: Admin clicks Add → Enters neighbor details → Selects house number → Sets ownership status → Saves → Neighbor appears in directory
 - **Success criteria**: All active neighbors are tracked with current information and accurate balances
 
+### Member Profile Pages (NEW)
+- **Functionality**: Detailed member profile pages showing complete payment history and document uploads
+- **Purpose**: Provide comprehensive view of member's financial relationship with HOA and store important documents
+- **Trigger**: Admin clicks View Profile from member list, or member accesses "My Profile" from user menu
+- **Progression**: User views profile → See member details and complete payment history → Upload documents (contracts, receipts, IDs) → Download or delete documents → Return to member list
+- **Success criteria**: Members can view their own profiles and documents, admins can view any member profile, documents are securely stored with metadata, payment history is complete and accurate
+
 ### Payment Tracking
 - **Functionality**: Record all payments received from neighbors
 - **Purpose**: Maintain accurate financial records and update neighbor balances
@@ -82,6 +89,8 @@ This is a multi-module financial management system with role-based access contro
 - **Balance Calculations**: Real-time balance updates even when payments/expenses are reversed
 - **Notification Permissions**: Handle denied browser notification permissions gracefully with fallback to in-app notifications only
 - **Password Security**: Enforce minimum password requirements and secure password storage
+- **File Upload Limits**: Documents are limited to 5MB with accepted formats (PDF, DOC, DOCX, JPG, PNG)
+- **Document Access Control**: Members can only view/upload their own documents, admins can view/manage all documents
 
 ## Design Direction
 
@@ -161,7 +170,7 @@ Animations should feel responsive and purposeful, reinforcing user actions witho
   - ChartLine for analytics
   - CalendarBlank for periods
   - ChatCircle for messaging
-  - User/UserGear for roles and user management
+  - User/UserGear/UserCircle for roles, user management, and profiles
   - Bell for notifications
   - Key for password operations
   - Eye/EyeSlash for password visibility
@@ -170,6 +179,10 @@ Animations should feel responsive and purposeful, reinforcing user actions witho
   - Trash for delete
   - MagnifyingGlass for search
   - Copy for clipboard operations
+  - Upload for document uploads
+  - Download for document downloads
+  - File/FileText/Receipt/IdentificationCard/Folder for document categories
+  - ArrowLeft for back navigation
 
 - **Spacing**:
   - Page padding: p-6 (24px)
@@ -187,3 +200,5 @@ Animations should feel responsive and purposeful, reinforcing user actions witho
   - Charts optimize for vertical space with adjusted aspect ratios
   - Dialogs become full-screen on mobile for better form interaction
   - Notification popover adjusts width for smaller screens
+  - Member profile grids stack vertically on mobile
+  - Document tables become card-based layout on mobile with action buttons
