@@ -30,6 +30,8 @@ export interface Neighbor {
   phoneNumber?: string
   ownershipStatus: OwnershipStatus
   isActive: boolean
+  isManagement: boolean
+  managementPosition?: string
   balance: number
   createdAt: string
 }

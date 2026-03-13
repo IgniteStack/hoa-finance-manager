@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Plus, PencilSimple, Trash, MagnifyingGlass } from '@phosphor-icons/react'
+import { Plus, PencilSimple, Trash, MagnifyingGlass, Star } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -32,6 +32,8 @@ export function NeighborManager() {
     phoneNumber: '',
     ownershipStatus: 'owner' as OwnershipStatus,
     isActive: true,
+    isManagement: false,
+    managementPosition: '',
     balance: 0
   })
 
@@ -44,6 +46,8 @@ export function NeighborManager() {
       phoneNumber: '',
       ownershipStatus: 'owner',
       isActive: true,
+      isManagement: false,
+      managementPosition: '',
       balance: 0
     })
     setEditingNeighbor(null)
@@ -64,6 +68,8 @@ export function NeighborManager() {
       phoneNumber: neighbor.phoneNumber || '',
       ownershipStatus: neighbor.ownershipStatus,
       isActive: neighbor.isActive,
+      isManagement: neighbor.isManagement ?? false,
+      managementPosition: neighbor.managementPosition || '',
       balance: neighbor.balance
     })
     setIsDialogOpen(true)
@@ -77,10 +83,14 @@ export function NeighborManager() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const managementPosition = formData.isManagement && formData.managementPosition.trim()
+      ? formData.managementPosition.trim()
+      : undefined
+
     if (editingNeighbor) {
       setNeighbors((current) => 
         (current || []).map(n => n.id === editingNeighbor.id 
-          ? { ...editingNeighbor, ...formData, houseNumber: parseInt(formData.houseNumber) }
+          ? { ...editingNeighbor, ...formData, houseNumber: parseInt(formData.houseNumber), managementPosition }
           : n
         )
       )
@@ -90,6 +100,7 @@ export function NeighborManager() {
         id: Date.now().toString(),
         ...formData,
         houseNumber: parseInt(formData.houseNumber),
+        managementPosition,
         createdAt: new Date().toISOString()
       }
       setNeighbors((current) => [...(current || []), newNeighbor])
@@ -156,6 +167,7 @@ export function NeighborManager() {
                     <TableHead>Phone</TableHead>
                     <TableHead>Ownership</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Management</TableHead>
                     {isAdmin && <TableHead className="text-right">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
@@ -176,6 +188,14 @@ export function NeighborManager() {
                         <Badge variant={neighbor.isActive ? 'default' : 'destructive'}>
                           {neighbor.isActive ? 'Active' : 'Inactive'}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {neighbor.isManagement ? (
+                          <Badge variant="outline" className="gap-1">
+                            <Star size={12} weight="fill" />
+                            {neighbor.managementPosition || 'Management'}
+                          </Badge>
+                        ) : null}
                       </TableCell>
                       {isAdmin && (
                         <TableCell className="text-right">
@@ -215,6 +235,12 @@ export function NeighborManager() {
                         <Badge variant={neighbor.isActive ? 'default' : 'destructive'} className="text-xs">
                           {neighbor.isActive ? 'Active' : 'Inactive'}
                         </Badge>
+                        {neighbor.isManagement && (
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <Star size={10} weight="fill" />
+                            {neighbor.managementPosition || 'Management'}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground font-mono mb-3">
@@ -337,6 +363,27 @@ export function NeighborManager() {
                   />
                   <Label htmlFor="isActive">Active</Label>
                 </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isManagement"
+                    checked={formData.isManagement}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isManagement: checked })}
+                  />
+                  <Label htmlFor="isManagement">Management Member</Label>
+                </div>
+
+                {formData.isManagement && (
+                  <div className="space-y-2">
+                    <Label htmlFor="managementPosition">Position <span className="text-muted-foreground">(optional)</span></Label>
+                    <Input
+                      id="managementPosition"
+                      placeholder="e.g. President, Secretary, Treasurer"
+                      value={formData.managementPosition}
+                      onChange={(e) => setFormData({ ...formData, managementPosition: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
               <DialogFooter className="flex-col sm:flex-row gap-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
