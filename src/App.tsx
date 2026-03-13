@@ -7,6 +7,7 @@ import { SetupWizard } from '@/components/setup/SetupWizard'
 import { LoginPage } from '@/components/LoginPage'
 import { DashboardPage } from '@/components/DashboardPage'
 import { MemberManager } from '@/components/members/MemberManager'
+import { NeighborManager } from '@/components/neighbors/NeighborManager'
 import { MemberProfile } from '@/components/members/MemberProfile'
 import { FinanceManager } from '@/components/finance/FinanceManager'
 import { MessagingPage } from '@/components/messaging/MessagingPage'
@@ -23,7 +24,7 @@ import { ChartLine, Users, CurrencyDollar, ChatCircle, SignOut, House, CalendarB
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 
-type Page = 'dashboard' | 'members' | 'finance' | 'messaging' | 'periods' | 'profile'
+type Page = 'dashboard' | 'members' | 'neighbors' | 'finance' | 'messaging' | 'periods' | 'profile'
 
 function AppContent() {
   const { isAuthenticated, logout, user, isAdmin } = useAuth()
@@ -89,6 +90,14 @@ function AppContent() {
           Periods
         </Button>
       )}
+      <Button
+        variant={currentPage === 'neighbors' ? 'default' : 'ghost'}
+        onClick={() => navigateTo('neighbors')}
+        className="gap-2 w-full md:w-auto justify-start"
+      >
+        <Users size={18} />
+        Neighbors
+      </Button>
       <Button
         variant={currentPage === 'members' ? 'default' : 'ghost'}
         onClick={() => navigateTo('members')}
@@ -209,6 +218,7 @@ function AppContent() {
         <div className="max-w-7xl mx-auto">
           {currentPage === 'dashboard' && <DashboardPage />}
           {currentPage === 'periods' && <FiscalPeriodManager />}
+          {currentPage === 'neighbors' && <NeighborManager />}
           {currentPage === 'members' && <MemberManager />}
           {currentPage === 'finance' && <FinanceManager />}
           {currentPage === 'messaging' && <MessagingPage />}

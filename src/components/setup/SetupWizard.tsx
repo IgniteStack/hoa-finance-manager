@@ -66,7 +66,7 @@ export function SetupWizard() {
       email: adminData.email,
       houseNumber: parseInt(adminData.houseNumber),
       phoneNumber: adminData.phoneNumber,
-      role: 'admin',
+      role: 'administration',
       ownershipStatus: 'owner',
       isActive: true,
       balance: 0,

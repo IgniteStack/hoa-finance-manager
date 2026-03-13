@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'neighbor'
+export type UserRole = 'administration' | 'user' | 'auditor'
 
 export type OwnershipStatus = 'owner' | 'tenant'
 
@@ -9,11 +9,14 @@ export type PeriodType = 'monthly' | 'quarterly' | 'yearly' | 'custom'
 export interface User {
   id: string
   firstName: string
+  middleName?: string
   lastName: string
+  secondLastName?: string
   email: string
   role: UserRole
   houseNumber: number
   phoneNumber?: string
+  phoneNumber2?: string
   ownershipStatus: OwnershipStatus
   isActive: boolean
   balance: number

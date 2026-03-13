@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout,
         updatePassword,
-        isAdmin: currentUser?.role === 'admin',
+        isAdmin: currentUser?.role === 'administration',
         users: users || []
       }}
     >

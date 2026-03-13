@@ -60,7 +60,7 @@ export function LoginPage() {
     toast.success('Email copied to clipboard')
   }
 
-  const adminUsers = users.filter(u => u.role === 'admin')
+  const adminUsers = users.filter(u => u.role === 'administration')
   const hasNoUsers = !users || users.length === 0
 
   return (

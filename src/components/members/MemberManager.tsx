@@ -40,7 +40,7 @@ export function MemberManager() {
     houseNumber: '',
     phoneNumber: '',
     ownershipStatus: 'owner' as OwnershipStatus,
-    role: 'neighbor' as UserRole,
+    role: 'user' as UserRole,
     isActive: true,
     balance: 0
   })
@@ -53,7 +53,7 @@ export function MemberManager() {
       houseNumber: '',
       phoneNumber: '',
       ownershipStatus: 'owner',
-      role: 'neighbor',
+      role: 'user',
       isActive: true,
       balance: 0
     })
@@ -247,7 +247,7 @@ export function MemberManager() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={member.role === 'admin' ? 'default' : 'outline'}>
+                        <Badge variant={member.role === 'administration' ? 'default' : 'outline'}>
                           {member.role}
                         </Badge>
                       </TableCell>
@@ -313,7 +313,7 @@ export function MemberManager() {
                         </div>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <Badge variant={member.role === 'admin' ? 'default' : 'outline'} className="text-xs">
+                        <Badge variant={member.role === 'administration' ? 'default' : 'outline'} className="text-xs">
                           {member.role}
                         </Badge>
                         <Badge variant={member.ownershipStatus === 'owner' ? 'default' : 'secondary'} className="text-xs">
@@ -473,8 +473,9 @@ export function MemberManager() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="neighbor">Neighbor</SelectItem>
+                          <SelectItem value="administration">Administration</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="auditor">Auditor</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
