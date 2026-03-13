@@ -97,7 +97,7 @@ export function SetupWizard() {
     setAuthUser(() => ({
       id: 'admin-1',
       email: adminData.email,
-      role: 'admin',
+      role: 'administration',
       neighborId: 'admin-1'
     }))
 
