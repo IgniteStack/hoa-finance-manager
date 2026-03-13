@@ -1,20 +1,19 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
+import { User, Payment, MemberDocument } from '@/lib/types'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, Car
-import { Dialog, DialogContent, DialogDescripti
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Upload, Download, Trash, File, FileText, Receipt, IdentificationCard, Folder } fr
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ArrowLeft, Upload, Download, Trash, File, FileText, Receipt, IdentificationCard, Folder } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-interface MemberProfileProps {
-  onBack: () => void
-
-  const [members] = useKV<User[]>('system-users', [
-  const [documents, setDocuments] = useKV<MemberDocument[]>('me
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
-    category: MemberDocument['cat
-import { toast } from 'sonner'
+import { format } from 'date-fns'
 
 interface MemberProfileProps {
   memberId: string
@@ -30,11 +29,11 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
   const [uploadForm, setUploadForm] = useState<{
     category: MemberDocument['category']
     description: string
-      if (file.size >
+    file: File | null
   }>({
     category: 'other',
     description: '',
-  }
+    file: null,
   })
 
   const member = members?.find(m => m.id === memberId)
@@ -44,47 +43,50 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
   const canManageDocuments = isAdmin || currentUser?.id === memberId
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        description: uploadForm.desc
+    const file = e.target.files?.[0]
     if (file) {
-        fileData
+      if (file.size > 5 * 1024 * 1024) {
         toast.error('File size must be less than 5MB')
-      setDocum
-       
-        return <IdentificationCard size={18}
-     
+        return
+      }
+      setUploadForm(prev => ({ ...prev, file }))
+    }
   }
 
-    if (bytes < 1024 * 1024) r
+  const handleUpload = async () => {
+    if (!uploadForm.file || !currentUser) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const fileData = reader.result as string
+      const newDocument: MemberDocument = {
+        id: Date.now().toString(),
+        memberId,
+        fileName: uploadForm.file!.name,
+        fileType: uploadForm.file!.type,
+        fileSize: uploadForm.file!.size,
+        category: uploadForm.category,
+        description: uploadForm.description,
+        uploadedBy: currentUser.email,
+        uploadedAt: new Date().toISOString(),
+        fileData,
+      }
+
+      setDocuments((current) => [...(current || []), newDocument])
+      toast.success('Document uploaded successfully')
+      setIsUploadDialogOpen(false)
+      setUploadForm({
+        category: 'other',
+        description: '',
+        file: null,
+      })
+    }
+    reader.readAsDataURL(uploadForm.file)
   }
 
-      <Card>
-          <p className="tex
-            <ArrowLeft className="mr-2" size={
-          </Button>
-      </Card>
-  }
-  return (
-      <div>
-          <ArrowLeft className="mr-2" si
-        </Button>
-
-        <Card className="md:col-span-1">
-            <CardTitle>Member Information</Ca
-          <CardC
-       
-
-                {member.email}
-            </div>
-            <div className="space-
-                <span className="text-sm text-muted-foreground">House N
-     
-
-                <span className="font-mon
-
-
-                  {member.ownershipStatus}
-              </div>
-              <div className
+  const handleDownload = (doc: MemberDocument) => {
+    const link = document.createElement('a')
+    link.href = doc.fileData
     link.download = doc.fileName
     link.click()
     toast.success('Document downloaded')
@@ -125,38 +127,36 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
           </Button>
         </CardContent>
       </Card>
-     
+    )
   }
 
   return (
-                          </div
-      <div>
-        <Button variant="ghost" onClick={onBack} className="mb-4">
-          <ArrowLeft className="mr-2" size={18} />
-          </CardContent>
-        </Button>
-
+    <div>
+      <Button variant="ghost" onClick={onBack} className="mb-4">
+        <ArrowLeft className="mr-2" size={18} />
+        Back to Members
+      </Button>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">
-              <Button 
+          <CardHeader>
             <CardTitle>Member Information</CardTitle>
-            )}
+          </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <div className="text-2xl font-bold">
                 {member.firstName} {member.lastName}
-                  <U
+              </div>
               <div className="text-sm text-muted-foreground mt-1">
                 {member.email}
               </div>
-            <div c
+            </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">House Number</span>
                 <span className="font-mono font-semibold">{member.houseNumber}</span>
-                    
+              </div>
               
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Phone</span>
@@ -167,13 +167,13 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                 <span className="text-sm text-muted-foreground">Type</span>
                 <Badge variant={member.ownershipStatus === 'owner' ? 'default' : 'secondary'}>
                   {member.ownershipStatus}
-                        
+                </Badge>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Role</span>
                 <Badge variant={member.role === 'admin' ? 'default' : 'outline'}>
-                        </Table
+                  {member.role}
                 </Badge>
               </div>
 
@@ -183,14 +183,14 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                   {member.isActive ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
-                  
+            </div>
 
-                        <p className="text-
+            <div className="pt-2">
               <div className="text-sm text-muted-foreground mb-1">Account Balance</div>
               <div className={`text-2xl font-bold font-mono ${member.balance < 0 ? 'text-destructive' : 'text-accent'}`}>
                 ${member.balance.toFixed(2)}
               </div>
-                  
+            </div>
 
             <div className="pt-2">
               <div className="text-sm text-muted-foreground mb-1">Total Payments</div>
@@ -199,18 +199,18 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
               </div>
             </div>
           </CardContent>
-      </Card>
+        </Card>
 
         <Card className="md:col-span-2">
           <CardHeader>
-            </DialogDescription>
+            <CardTitle>Payment History</CardTitle>
             <CardDescription>Complete payment record for this member</CardDescription>
-            <div classN
+          </CardHeader>
           <CardContent>
-                onValueChange={(value: Membe
+            {memberPayments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <p>No payments recorded yet</p>
-            <div cla
+              </div>
             ) : (
               <div className="space-y-4">
                 <div className="hidden md:block rounded-md border">
@@ -221,11 +221,11 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                         <TableHead>Concept</TableHead>
                         <TableHead>Bank Account</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
-              <Label htmlFor="fil
+                      </TableRow>
                     </TableHeader>
-                onChange={handl
+                    <TableBody>
                       {memberPayments.map((payment) => (
-              {uploadForm.file && (
+                        <TableRow key={payment.id}>
                           <TableCell className="font-mono text-sm">
                             {format(new Date(payment.date), 'MMM dd, yyyy')}
                           </TableCell>
@@ -237,13 +237,13 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                             ${payment.amount.toFixed(2)}
                           </TableCell>
                         </TableRow>
-    </div>
+                      ))}
                     </TableBody>
-
+                  </Table>
                 </div>
 
                 <div className="md:hidden space-y-3">
-
+                  {memberPayments.map((payment) => (
                     <Card key={payment.id}>
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
@@ -261,45 +261,45 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                           <div className="text-xs text-muted-foreground font-mono">
                             Account: {payment.bankAccount}
                           </div>
-
+                        )}
                       </CardContent>
                     </Card>
                   ))}
-
+                </div>
               </div>
-
+            )}
           </CardContent>
-
+        </Card>
       </div>
 
-      <Card>
+      <Card className="mt-6">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle>Documents</CardTitle>
               <CardDescription>Contracts, receipts, and identification files</CardDescription>
             </div>
-
+            {canManageDocuments && (
               <Button onClick={() => setIsUploadDialogOpen(true)}>
                 <Upload className="mr-2" size={18} />
                 Upload Document
-
+              </Button>
             )}
-
+          </div>
         </CardHeader>
-
+        <CardContent>
           {memberDocuments.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <File size={48} className="mx-auto mb-3 opacity-50" />
-
+              <p>No documents uploaded yet</p>
               {canManageDocuments && (
                 <Button variant="outline" onClick={() => setIsUploadDialogOpen(true)} className="mt-4">
                   <Upload className="mr-2" size={18} />
                   Upload First Document
                 </Button>
-
+              )}
             </div>
-
+          ) : (
             <div className="space-y-4">
               <div className="hidden md:block rounded-md border">
                 <Table>
@@ -309,11 +309,11 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                       <TableHead>Category</TableHead>
                       <TableHead>Description</TableHead>
                       <TableHead>Size</TableHead>
-
+                      <TableHead>Uploaded</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
-
+                    </TableRow>
                   </TableHeader>
-
+                  <TableBody>
                     {memberDocuments.map((doc) => (
                       <TableRow key={doc.id}>
                         <TableCell>
@@ -321,19 +321,19 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                             {getCategoryIcon(doc.category)}
                             <span className="font-medium">{doc.fileName}</span>
                           </div>
-
+                        </TableCell>
                         <TableCell>
-
+                          <Badge variant="outline" className="capitalize">
                             {doc.category}
                           </Badge>
-
+                        </TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
                           {doc.description || '-'}
                         </TableCell>
                         <TableCell className="font-mono text-sm">
-
+                          {formatFileSize(doc.fileSize)}
                         </TableCell>
-
+                        <TableCell>
                           <div>{format(new Date(doc.uploadedAt), 'MMM dd, yyyy')}</div>
                           <div className="text-xs text-muted-foreground">{doc.uploadedBy}</div>
                         </TableCell>
@@ -345,23 +345,23 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                             {canManageDocuments && (
                               <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
                                 <Trash size={18} />
-
+                              </Button>
                             )}
-
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-
+              </div>
 
               <div className="md:hidden space-y-3">
                 {memberDocuments.map((doc) => (
-
+                  <Card key={doc.id}>
                     <CardContent className="p-4">
-
+                      <div className="flex items-start gap-3 mb-3">
                         {getCategoryIcon(doc.category)}
-
+                        <div className="flex-1 min-w-0">
                           <div className="font-medium truncate">{doc.fileName}</div>
                           <Badge variant="outline" className="capitalize text-xs mt-1">
                             {doc.category}
@@ -373,14 +373,12 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                       </div>
                       {doc.description && (
                         <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-
+                          {doc.description}
                         </p>
-
+                      )}
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
-
-                          <div>{format(new Date(doc.uploadedAt), 'MMM dd, yyyy')}</div>
-                          <div>by {doc.uploadedBy}</div>
-                        </div>
+                        <div>{format(new Date(doc.uploadedAt), 'MMM dd, yyyy')}</div>
+                        <div>by {doc.uploadedBy}</div>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => handleDownload(doc)} className="flex-1">
@@ -389,17 +387,17 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
                         </Button>
                         {canManageDocuments && (
                           <Button variant="outline" size="sm" onClick={() => handleDelete(doc.id)}>
-
+                            <Trash size={16} />
                           </Button>
-
+                        )}
                       </div>
-
+                    </CardContent>
                   </Card>
-
+                ))}
               </div>
-
+            </div>
           )}
-
+        </CardContent>
       </Card>
 
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
@@ -409,73 +407,67 @@ export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
             <DialogDescription>
               Add a new document for {member.firstName} {member.lastName}
             </DialogDescription>
-
+          </DialogHeader>
           
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="file">File</Label>
+              <Input
+                id="file"
+                type="file"
+                onChange={handleFileSelect}
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              />
+              {uploadForm.file && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {uploadForm.file.name} ({formatFileSize(uploadForm.file.size)})
+                </p>
+              )}
             </div>
 
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={uploadForm.category}
+                onValueChange={(value: MemberDocument['category']) =>
+                  setUploadForm(prev => ({ ...prev, category: value }))
+                }
+              >
+                <SelectTrigger id="category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="contract">Contract</SelectItem>
+                  <SelectItem value="receipt">Receipt</SelectItem>
+                  <SelectItem value="identification">Identification</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
+            <div>
+              <Label htmlFor="description">Description (Optional)</Label>
+              <Textarea
+                id="description"
+                value={uploadForm.description}
+                onChange={(e) => setUploadForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Add a description for this document..."
+                rows={3}
+              />
+            </div>
+          </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpload} disabled={!uploadForm.file}>
+              <Upload size={18} className="mr-2" />
+              Upload
+            </Button>
+          </DialogFooter>
         </DialogContent>
-
+      </Dialog>
     </div>
-
+  )
 }
