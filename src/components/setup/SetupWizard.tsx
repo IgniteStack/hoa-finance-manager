@@ -57,51 +57,59 @@ export function SetupWizard() {
       return
     }
 
-    const hashedPassword = await hashPassword(adminData.password)
+    try {
+      const hashedPassword = await hashPassword(adminData.password)
 
-    const adminUser: User = {
-      id: 'admin-1',
-      firstName: adminData.firstName,
-      lastName: adminData.lastName,
-      email: adminData.email,
-      houseNumber: parseInt(adminData.houseNumber),
-      phoneNumber: adminData.phoneNumber,
-      role: 'administration',
-      ownershipStatus: 'owner',
-      isActive: true,
-      balance: 0,
-      password: hashedPassword,
-      mustChangePassword: false,
-      createdAt: new Date().toISOString()
+      const adminUser: User = {
+        id: 'admin-1',
+        firstName: adminData.firstName,
+        lastName: adminData.lastName,
+        email: adminData.email,
+        houseNumber: parseInt(adminData.houseNumber),
+        phoneNumber: adminData.phoneNumber,
+        role: 'administration',
+        ownershipStatus: 'owner',
+        isActive: true,
+        balance: 0,
+        password: hashedPassword,
+        mustChangePassword: false,
+        createdAt: new Date().toISOString()
+      }
+
+      const firstPeriod: FiscalPeriod = {
+        id: 'period-1',
+        name: periodData.name,
+        type: periodData.type,
+        startDate: periodData.startDate,
+        endDate: periodData.endDate,
+        isClosed: false,
+        createdAt: new Date().toISOString()
+      }
+
+      await window.spark.kv.set('system-users', [adminUser])
+      await window.spark.kv.set('fiscal-periods', [firstPeriod])
+      await window.spark.kv.set('auth-user', {
+        id: 'admin-1',
+        email: adminData.email,
+        role: 'administration',
+        neighborId: 'admin-1'
+      })
+      
+      await window.spark.kv.set('system-config', {
+        isSetupComplete: true,
+        totalHouses: parseInt(totalHouses),
+        createdAt: new Date().toISOString()
+      })
+
+      toast.success('Setup complete! Welcome to HOA Finance Manager')
+      
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
+    } catch (error) {
+      console.error('Setup error:', error)
+      toast.error('Failed to complete setup. Please try again.')
     }
-
-    const firstPeriod: FiscalPeriod = {
-      id: 'period-1',
-      name: periodData.name,
-      type: periodData.type,
-      startDate: periodData.startDate,
-      endDate: periodData.endDate,
-      isClosed: false,
-      createdAt: new Date().toISOString()
-    }
-
-    setMembers(() => [adminUser])
-    setFiscalPeriods(() => [firstPeriod])
-    
-    setSystemConfig(() => ({
-      isSetupComplete: true,
-      totalHouses: parseInt(totalHouses),
-      createdAt: new Date().toISOString()
-    }))
-
-    setAuthUser(() => ({
-      id: 'admin-1',
-      email: adminData.email,
-      role: 'administration',
-      neighborId: 'admin-1'
-    }))
-
-    toast.success('Setup complete! Welcome to HOA Finance Manager')
   }
 
   return (
