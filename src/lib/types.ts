@@ -44,6 +44,7 @@ export interface Expense {
   notes?: string
   fiscalPeriodId?: string
   status: RecordStatus
+  postedAt?: string
   reversedAt?: string
   createdAt: string
 }
@@ -58,6 +59,7 @@ export interface Payment {
   bankAccount?: string
   fiscalPeriodId?: string
   status: RecordStatus
+  postedAt?: string
   reversedAt?: string
   createdAt: string
 }
