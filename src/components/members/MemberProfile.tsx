@@ -15,12 +15,12 @@ import { ArrowLeft, Upload, Download, Trash, File, FileText, Image as ImageIcon,
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 
+interface MemberProfileProps {
+  memberId: string
   onBack: () => void
+}
 
-  const { user: curr
- 
-
-    category: MemberDocument['category']
+export function MemberProfile({ memberId, onBack }: MemberProfileProps) {
   const { user: currentUser, isAdmin } = useAuth()
   const [members] = useKV<User[]>('system-users', [])
   const [payments] = useKV<Payment[]>('payments', [])
@@ -54,13 +54,18 @@ import { format } from 'date-fns'
         </Button>
       </div>
     )
-   
+  }
 
   const handleUpload = () => {
     if (!uploadForm.file) {
       toast.error('Please select a file')
       return
-    r
+    }
+
+    if (uploadForm.file.size > 10 * 1024 * 1024) {
+      toast.error('File size exceeds 10MB')
+      return
+    }
 
     const reader = new FileReader()
     reader.onload = () => {
@@ -74,24 +79,24 @@ import { format } from 'date-fns'
         category: uploadForm.category,
         description: uploadForm.description,
         uploadedBy: currentUser?.email || 'Unknown',
-    <div className="space-y-6">
-        <Button v
-       
+        uploadedAt: new Date().toISOString(),
+        fileData,
+      }
 
-            {member.firstName} {member.lastName}
-          <p className="text-muted-foreground">House 
+      setDocuments((current) => [...(current || []), newDocument])
+      toast.success('Document uploaded successfully')
       setIsUploadDialogOpen(false)
-      <div className=
+      setUploadForm({
         category: 'other',
-          </CardHeader>
+        description: '',
         file: null,
-        
+      })
     }
-              </Badge>
+    reader.readAsDataURL(uploadForm.file)
   }
 
-                <span className="font-medium">{memb
-              {member.phoneNumber && (
+  const handleDownload = (doc: MemberDocument) => {
+    const link = document.createElement('a')
     link.href = doc.fileData
     link.download = doc.fileName
     link.click()
@@ -121,7 +126,7 @@ import { format } from 'date-fns'
     }
   }
 
-          
+  return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" onClick={onBack}>
@@ -134,7 +139,7 @@ import { format } from 'date-fns'
           </h1>
           <p className="text-muted-foreground">House #{member.houseNumber}</p>
         </div>
-            
+      </div>
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
@@ -149,13 +154,13 @@ import { format } from 'date-fns'
               <Badge variant="outline" className="capitalize">
                 {member.ownershipStatus}
               </Badge>
-        <CardConte
+            </div>
             
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Email</span>
                 <span className="font-medium">{member.email}</span>
-                  <T
+              </div>
               {member.phoneNumber && (
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Phone</span>
@@ -171,227 +176,158 @@ import { format } from 'date-fns'
             </div>
 
             <div className="pt-4 border-t">
-                        <TableCell>
-                          <div className="text-xs text-muted-foreground">{doc.uploadedBy}</div>
-                        <TableCell className
-                    
-            </div>
-
-                              </Bu
-                          </div>
-                      </TableRow>
-                  </TableBody>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total Paid</span>
+                <span className="text-xl font-bold text-primary">
+                  ${totalPaid.toFixed(2)}
+                </span>
               </div>
-              <div
-                  <Card 
+            </div>
+          </CardContent>
         </Card>
 
-                          <Badge variant
-                      
+        <Card className="md:col-span-2">
+          <CardHeader>
             <CardTitle>Payment History</CardTitle>
-                        </div>
+            <CardDescription>
+              {memberPayments.length} payment{memberPayments.length !== 1 ? 's' : ''} recorded
+            </CardDescription>
           </CardHeader>
-                       
+          <CardContent>
             {memberPayments.length === 0 ? (
-                        <span>{format(new Date(doc.uploadedAt), 'MMM d
-                      </div>
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No payments recorded yet</p>
               </div>
-                 
-                        {canManageDocumen
-                            <Trash size={16} />
-                        )
-                    </CardContent
-                ))}
-            </div>
-        </CardContent>
-
-        <DialogContent>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Concept</TableHead>
+                      <TableHead>Bank Account</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {memberPayments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell>
+                          {format(new Date(payment.date), 'MMM dd, yyyy')}
+                        </TableCell>
+                        <TableCell>{payment.concept || 'Payment'}</TableCell>
+                        <TableCell>{payment.bankAccount || '-'}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          ${payment.amount.toFixed(2)}
+                        </TableCell>
                       </TableRow>
-              Add a new document f
-                    <TableBody>
-            <div className="space-y-2">
-                        <TableRow key={payment.id}>
-                onValueChange={(value) => setUploadForm({ ...upload
-                <SelectTrigger id="category">
-                </SelectTrigger>
-                  <SelectItem value="contract">Contract</SelectItem>
-                  <SelectItem value="identification">Identification
-                </SelectContent>
-            </div>
-            <div className="space-y-2">
-              <Textarea
-                value={uploadForm.desc
-                placeholder="Brief 
-                      ))}
-            <div className="spac
-                  </Table>
-                type="
-
-              <p className="text-xs text-muted-foregr
-                  {memberPayments.map((payment) => (
-
-              <Button variant="outline" onClick={()
-              </Button>
-                <Upload classNa
-              </Button>
-          </div>
-      </Dialog>
-  )
-
-
-
-
-
-
-
-
-
-                        )}
-
-
-
-                </div>
-
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
-
+          </CardContent>
         </Card>
-
+      </div>
 
       <Card>
-
-
-
-
-
-
-            {canManageDocuments && (
-
-
-
-              </Button>
-
-          </div>
-
-        <CardContent>
-
-
-
-              <p>No documents uploaded yet</p>
-
-
-
-
-
-              )}
-
-          ) : (
-
-
-
-
-
-
-
-
-
-                      <TableHead>Uploaded</TableHead>
-
-                    </TableRow>
-
-                  <TableBody>
-
-
-
-
-
-
-
-                        </TableCell>
-
-                          <Badge variant="outline" className="capitalize">
-
-
-                        </TableCell>
-
-
-
-
-                          {formatFileSize(doc.fileSize)}
-
-                        <TableCell>
-
-
-
-
-
-
-
-
-
-
-
-                              </Button>
-
-                          </div>
-
-
-
-
-
-              </div>
-
-
-
-                  <Card key={doc.id}>
-
-                      <div className="flex items-start gap-3 mb-3">
-
-                        <div className="flex-1 min-w-0">
-
-
-
-
-
-
-
-
-
-
-
-                          {doc.description}
-
-                      )}
-
-                        <span>{format(new Date(doc.uploadedAt), 'MMM dd, yyyy')}</span>
-                        <span>{doc.uploadedBy}</span>
-
-
-
-
-
-
-
-
-                            <Trash size={16} />
-
-                        )}
-
-                    </CardContent>
-
-                ))}
-
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Documents</CardTitle>
+              <CardDescription>
+                {memberDocuments.length} document{memberDocuments.length !== 1 ? 's' : ''} uploaded
+              </CardDescription>
             </div>
-
+            {canManageDocuments && (
+              <Button onClick={() => setIsUploadDialogOpen(true)}>
+                <Upload className="mr-2" size={18} />
+                Upload
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {memberDocuments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No documents uploaded yet</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Document</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Size</TableHead>
+                    <TableHead>Uploaded</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {memberDocuments.map((doc) => (
+                    <TableRow key={doc.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {getCategoryIcon(doc.category)}
+                          <div>
+                            <div className="font-medium">{doc.fileName}</div>
+                            {doc.description && (
+                              <div className="text-xs text-muted-foreground">{doc.description}</div>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {doc.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {formatFileSize(doc.fileSize)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div>{format(new Date(doc.uploadedAt), 'MMM dd, yyyy')}</div>
+                          <div className="text-xs text-muted-foreground">{doc.uploadedBy}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleDownload(doc)}
+                          >
+                            <Download size={16} />
+                          </Button>
+                          {canManageDocuments && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleDelete(doc.id)}
+                            >
+                              <Trash size={16} />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
+      </Card>
 
-
-
-
-
-
-
-
-
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Document</DialogTitle>
+            <DialogDescription>
+              Add a new document for {member.firstName} {member.lastName}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -410,7 +346,7 @@ import { format } from 'date-fns'
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
-
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description (Optional)</Label>
@@ -445,8 +381,8 @@ import { format } from 'date-fns'
               </Button>
             </div>
           </div>
-
+        </DialogContent>
       </Dialog>
-
+    </div>
   )
-
+}
